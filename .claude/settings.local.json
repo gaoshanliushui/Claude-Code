@@ -96,7 +96,9 @@
       "Bash(node test/debug_t5_full.js)",
       "Bash(cp /tmp/dbg.js F:/Project/vibeCoding/tank/test/dbg_flow.js)",
       "Bash(node test/dbg_flow.js)",
-      "Bash(openspec list:*)"
+      "Bash(openspec list:*)",
+      "Bash(bun run:*)",
+      "Bash(bun x:*)"
     ]
   }
 }
