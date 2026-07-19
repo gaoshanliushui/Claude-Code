@@ -4814,7 +4814,7 @@ export function REPL({
 		<MCPConnectionManager key={remountKey} dynamicMcpConfig={dynamicMcpConfig} isStrictMcpConfig={strictMcpConfig}>
 			<FullscreenLayout scrollRef={scrollRef} overlay={toolPermissionOverlay}
 			                  bottomFloat={feature('BUDDY') && companionVisible && !companionNarrow ?
-				                  <CompanionFloatingBubble/> : undefined} modal={centeredModal}
+								  <CompanionFloatingBubble/> : undefined} modal={centeredModal}
 			                  modalScrollRef={modalScrollRef} dividerYRef={dividerYRef} hidePill={!!viewedAgentTask}
 			                  hideSticky={!!viewedTeammateTask} newMessageCount={unseenDivider?.count ?? 0}
 			                  onPillClick={() => {

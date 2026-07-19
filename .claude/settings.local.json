@@ -98,7 +98,8 @@
       "Bash(node test/dbg_flow.js)",
       "Bash(openspec list:*)",
       "Bash(bun run:*)",
-      "Bash(bun x:*)"
+      "Bash(bun x:*)",
+      "Skill(claude-api)"
     ]
   }
 }
