@@ -99,7 +99,9 @@
       "Bash(openspec list:*)",
       "Bash(bun run:*)",
       "Bash(bun x:*)",
-      "Skill(claude-api)"
+      "Skill(claude-api)",
+      "WebSearch",
+      "WebFetch(domain:www.weather.com.cn)"
     ]
   }
 }
