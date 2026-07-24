@@ -107,7 +107,8 @@
       "Bash(mkdir -p \"F:/Project/agent/coder/MyCode/code_assistant/src/teams\")",
       "Bash(mkdir -p \"F:/Project/agent/coder/MyCode/code_assistant/tests/test_teams\")",
       "Bash(python -m pytest tests/test_teams/test_file_lock.py -v)",
-      "Bash(python -m pytest tests/test_tools/test_task_tool_dag.py -v)"
+      "Bash(python -m pytest tests/test_tools/test_task_tool_dag.py -v)",
+      "Bash(bun build *)"
     ]
   }
 }
