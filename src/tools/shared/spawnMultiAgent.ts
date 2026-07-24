@@ -471,7 +471,7 @@ async function handleSpawnSplitPane(
 		},
 	}))
 
-	// Register background task so teammates appear in the tasks pill/dialog
+	// Register background agent so teammates appear in the tasks pill/dialog
 	registerOutOfProcessTeammateTask(setAppState, {
 		teammateId,
 		sanitizedName,
@@ -684,7 +684,7 @@ async function handleSpawnSeparateWindow(
 		},
 	}))
 
-	// Register background task so tmux teammates appear in the tasks pill/dialog
+	// Register background agent so tmux teammates appear in the tasks pill/dialog
 	// Separate window spawns are always outside tmux (external swarm session)
 	registerOutOfProcessTeammateTask(setAppState, {
 		teammateId,
@@ -753,7 +753,7 @@ async function handleSpawnSeparateWindow(
 }
 
 /**
- * Register a background task entry for an out-of-process (tmux/iTerm2) teammate.
+ * Register a background agent entry for an out-of-process (tmux/iTerm2) teammate.
  * This makes tmux teammates visible in the background tasks pill and dialog,
  * matching how in-process teammates are tracked.
  */

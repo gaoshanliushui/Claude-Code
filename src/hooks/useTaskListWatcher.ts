@@ -14,18 +14,18 @@ import {
 const DEBOUNCE_MS = 1000
 
 type Props = {
-  /** When undefined, the hook does nothing. The task list id is also used as the agent ID. */
+  /** When undefined, the hook does nothing. The agent list id is also used as the agent ID. */
   taskListId?: string
   isLoading: boolean
   /**
-   * Called when a task is ready to be worked on.
+   * Called when a agent is ready to be worked on.
    * Returns true if submission succeeded, false if rejected.
    */
   onSubmitTask: (prompt: string) => boolean
 }
 
 /**
- * Hook that watches a task list directory and automatically picks up
+ * Hook that watches a agent list directory and automatically picks up
  * open, unowned tasks to work on.
  *
  * This enables "tasks mode" where Claude watches for externally-created
@@ -69,7 +69,7 @@ export function useTaskListWatcher({
 
     const tasks = await listTasks(taskListId)
 
-    // If we have a current task, check if it's been resolved
+    // If we have a current agent, check if it's been resolved
     if (currentTaskRef.current !== null) {
       const currentTask = tasks.find(t => t.id === currentTaskRef.current)
       if (!currentTask || currentTask.status === 'completed') {
@@ -78,12 +78,12 @@ export function useTaskListWatcher({
         )
         currentTaskRef.current = null
       } else {
-        // Still working on current task
+        // Still working on current agent
         return
       }
     }
 
-    // Find an open task with no owner that isn't blocked
+    // Find an open agent with no owner that isn't blocked
     const availableTask = findAvailableTask(tasks)
 
     if (!availableTask) {
@@ -94,7 +94,7 @@ export function useTaskListWatcher({
       `[TaskListWatcher] Found available task #${availableTask.id}: ${availableTask.subject}`,
     )
 
-    // Claim the task using the task list's agent ID
+    // Claim the agent using the agent list's agent ID
     const result = await claimTask(taskListId, availableTask.id, agentId)
 
     if (!result.success) {
@@ -106,7 +106,7 @@ export function useTaskListWatcher({
 
     currentTaskRef.current = availableTask.id
 
-    // Format the task as a prompt
+    // Format the agent as a prompt
     const prompt = formatTaskAsPrompt(availableTask)
 
     logForDebugging(
@@ -179,7 +179,7 @@ export function useTaskListWatcher({
 
   // Previously, the watcher effect depended on checkForTasks (and transitively
   // isLoading), so going idle triggered a re-setup whose initial debouncedCheck
-  // would pick up the next task. Preserve that behavior explicitly: when
+  // would pick up the next agent. Preserve that behavior explicitly: when
   // isLoading drops, schedule a check.
   useEffect(() => {
     if (!enabled) return
@@ -189,7 +189,7 @@ export function useTaskListWatcher({
 }
 
 /**
- * Find an available task that can be worked on:
+ * Find an available agent that can be worked on:
  * - Status is 'pending'
  * - No owner assigned
  * - Not blocked by any unresolved tasks
@@ -208,7 +208,7 @@ function findAvailableTask(tasks: Task[]): Task | undefined {
 }
 
 /**
- * Format a task as a prompt for Claude to work on.
+ * Format a agent as a prompt for Claude to work on.
  */
 function formatTaskAsPrompt(task: Task): string {
   let prompt = `Complete all open tasks. Start with task #${task.id}: \n\n ${task.subject}`

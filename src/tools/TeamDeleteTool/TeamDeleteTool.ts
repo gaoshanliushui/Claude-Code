@@ -48,7 +48,7 @@ export const TeamDeleteTool: Tool<InputSchema, Output> = buildTool({
 	},
 
 	async description() {
-		return 'Clean up team and task directories when the swarm is complete'
+		return 'Clean up team and agent directories when the swarm is complete'
 	},
 
 	async prompt() {

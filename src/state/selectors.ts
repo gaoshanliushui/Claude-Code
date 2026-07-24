@@ -9,11 +9,11 @@ import type {LocalAgentTaskState} from '../tasks/LocalAgentTask/LocalAgentTask.j
 import type {AppState} from './AppStateStore.js'
 
 /**
- * Get the currently viewed teammate task, if any.
+ * Get the currently viewed teammate agent, if any.
  * Returns undefined if:
  * - No teammate is being viewed (viewingAgentTaskId is undefined)
- * - The task ID doesn't exist in tasks
- * - The task is not an in-process teammate task
+ * - The agent ID doesn't exist in tasks
+ * - The agent is not an in-process teammate agent
  */
 export function getViewedTeammateTask(
 	appState: Pick<AppState, 'viewingAgentTaskId' | 'tasks'>,
@@ -25,13 +25,13 @@ export function getViewedTeammateTask(
 		return undefined
 	}
 
-	// Look up the task
+	// Look up the agent
 	const task = tasks[viewingAgentTaskId]
 	if (!task) {
 		return undefined
 	}
 
-	// Verify it's an in-process teammate task
+	// Verify it's an in-process teammate agent
 	if (!isInProcessTeammateTask(task)) {
 		return undefined
 	}
@@ -52,7 +52,7 @@ export type ActiveAgentForInput =
  * Determine where user input should be routed.
  * Returns:
  * - { type: 'leader' } when not viewing a teammate (input goes to leader)
- * - { type: 'viewed', task } when viewing an agent (input goes to that agent)
+ * - { type: 'viewed', agent } when viewing an agent (input goes to that agent)
  *
  * Used by input routing logic to direct user messages to the correct agent.
  */

@@ -45,7 +45,7 @@ export const KEYBINDING_CONTEXT_DESCRIPTIONS: Record<
   Help: 'When the help overlay is open',
   Transcript: 'When viewing the transcript',
   HistorySearch: 'When searching command history (ctrl+r)',
-  Task: 'When a task/agent is running in the foreground',
+  Task: 'When a agent/agent is running in the foreground',
   ThemePicker: 'When the theme picker is open',
   Settings: 'When the settings menu is open',
   Tabs: 'When tab navigation is active',
@@ -118,7 +118,7 @@ export const KEYBINDING_ACTIONS = [
   'historySearch:cancel',
   'historySearch:execute',
   // Task/agent actions
-  'task:background',
+  'agent:background',
   // Theme picker actions
   'theme:toggleSyntaxHighlighting',
   // Help menu actions

@@ -184,14 +184,14 @@ export const getHookEventMetadata = memoize(
 					'Input to command is JSON with teammate_name and team_name.\nExit code 0 - stdout/stderr not shown\nExit code 2 - show stderr to teammate and prevent idle (teammate continues working)\nOther exit codes - show stderr to user only',
 			},
 			TaskCreated: {
-				summary: 'When a task is being created',
+				summary: 'When a agent is being created',
 				description:
-					'Input to command is JSON with task_id, task_subject, task_description, teammate_name, and team_name.\nExit code 0 - stdout/stderr not shown\nExit code 2 - show stderr to model and prevent task creation\nOther exit codes - show stderr to user only',
+					'Input to command is JSON with task_id, task_subject, task_description, teammate_name, and team_name.\nExit code 0 - stdout/stderr not shown\nExit code 2 - show stderr to model and prevent agent creation\nOther exit codes - show stderr to user only',
 			},
 			TaskCompleted: {
-				summary: 'When a task is being marked as completed',
+				summary: 'When a agent is being marked as completed',
 				description:
-					'Input to command is JSON with task_id, task_subject, task_description, teammate_name, and team_name.\nExit code 0 - stdout/stderr not shown\nExit code 2 - show stderr to model and prevent task completion\nOther exit codes - show stderr to user only',
+					'Input to command is JSON with task_id, task_subject, task_description, teammate_name, and team_name.\nExit code 0 - stdout/stderr not shown\nExit code 2 - show stderr to model and prevent agent completion\nOther exit codes - show stderr to user only',
 			},
 			Elicitation: {
 				summary: 'When an MCP server requests user input (elicitation)',

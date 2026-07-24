@@ -6,7 +6,7 @@
 > - `src/tools/MCPTool/MCPTool.ts`（77 行）
 > - `src/tools/BashTool/BashTool.tsx`（1184 行，本地文件实际更大）
 >
-> 关联文档：[`docs/11-tool-execution.md`](11-tool-execution.md) · [`docs/12-run-agent.md`](../task/12-run-agent.md) · [`docs/17-architecture.md`](../architecture/17-architecture.md) · [`docs/23-design-and-core-modules.md`](../architecture/23-design-and-core-modules.md)
+> 关联文档：[`docs/11-tool-execution.md`](11-tool-execution.md) · [`docs/12-run-agent.md`](../agent/12-run-agent.md) · [`docs/17-architecture.md`](../architecture/17-architecture.md) · [`docs/23-design-and-core-modules.md`](../architecture/23-design-and-core-modules.md)
 
 这 4 个工具是 Claude Code 的**执行核心**：
 
@@ -574,7 +574,7 @@ mapToolResultToToolResultBlockParam({interrupted, stdout, stderr, isImage, backg
     processedStdout = buildLargeToolResultMessage({ filepath, originalSize, preview, hasMore })
   }
   
-  // 4. backgrounded task → 附加 backgroundInfo 字符串
+  // 4. backgrounded agent → 附加 backgroundInfo 字符串
   if (backgroundTaskId) {
     backgroundInfo = assistantAutoBackgrounded
       ? `Command exceeded the assistant-mode blocking budget (${ASSISTANT_BLOCKING_BUDGET_MS / 1000}s) and was moved to the background...`
@@ -786,8 +786,8 @@ T=30s  模型继续推进... 最终 end_turn
 ## 推荐阅读
 
 - [`docs/11-tool-execution.md`](11-tool-execution.md) —— 工具执行通用路径
-- [`docs/12-run-agent.md`](../task/12-run-agent.md) —— Subagent 派生与 fork
+- [`docs/12-run-agent.md`](../agent/12-run-agent.md) —— Subagent 派生与 fork
 - [`docs/14-tool-hooks.md`](14-tool-hooks.md) —— PreToolUse / PostToolUse 钩子
 - [`docs/25-streaming-tool-executor.md`](25-streaming-tool-executor.md) —— 4 个工具如何被并发执行
-- [`docs/27-task-tools.md`](../task/27-task-tools.md) —— 后台任务工具族
+- [`docs/27-task-tools.md`](../agent/27-task-tools.md) —— 后台任务工具族
 - [`docs/23-design-and-core-modules.md`](../architecture/23-design-and-core-modules.md) —— 整体设计原理

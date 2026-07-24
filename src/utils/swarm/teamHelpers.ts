@@ -21,7 +21,7 @@ export const inputSchema = lazySchema(() =>
 		operation: z
 			.enum(['spawnTeam', 'cleanup'])
 			.describe(
-				'Operation: spawnTeam to create a team, cleanup to remove team and task directories.',
+				'Operation: spawnTeam to create a team, cleanup to remove team and agent directories.',
 			),
 		agent_type: z
 			.string()
@@ -634,7 +634,7 @@ async function killOrphanedTeammatePanes(teamName: string): Promise<void> {
 }
 
 /**
- * Cleans up team and task directories for a given team name.
+ * Cleans up team and agent directories for a given team name.
  * Also cleans up git worktrees created for teammates.
  * Called when a swarm session is terminated.
  */

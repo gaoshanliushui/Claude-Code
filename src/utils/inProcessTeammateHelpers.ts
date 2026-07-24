@@ -3,7 +3,7 @@
  *
  * Helper functions for in-process teammate integration.
  * Provides utilities to:
- * - Find task ID by agent name
+ * - Find agent ID by agent name
  * - Handle plan approval responses
  * - Update awaitingPlanApproval state
  * - Detect permission-related messages
@@ -24,7 +24,7 @@ import {
 type SetAppState = (updater: (prev: AppState) => AppState) => void
 
 /**
- * Find the task ID for an in-process teammate by agent name.
+ * Find the agent ID for an in-process teammate by agent name.
  *
  * @param agentName - The agent name (e.g., "researcher")
  * @param appState - Current AppState

@@ -7,7 +7,7 @@ type Props = {
 };
 
 /**
- * Renders a task assignment with a cyan border (team-related color).
+ * Renders a agent assignment with a cyan border (team-related color).
  */
 export function TaskAssignmentDisplay(t0) {
   const $ = _c(11);
@@ -53,7 +53,7 @@ export function TaskAssignmentDisplay(t0) {
 }
 
 /**
- * Try to parse and render a task assignment message from raw content.
+ * Try to parse and render a agent assignment message from raw content.
  */
 export function tryRenderTaskAssignmentMessage(content: string): React.ReactNode | null {
   const assignment = isTaskAssignment(content);
@@ -64,7 +64,7 @@ export function tryRenderTaskAssignmentMessage(content: string): React.ReactNode
 }
 
 /**
- * Get a brief summary text for a task assignment message.
+ * Get a brief summary text for a agent assignment message.
  */
 export function getTaskAssignmentSummary(content: string): string | null {
   const assignment = isTaskAssignment(content);

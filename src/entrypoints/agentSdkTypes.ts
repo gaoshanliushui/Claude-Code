@@ -277,7 +277,7 @@ export async function forkSession(
 // ============================================================================
 
 /**
- * A scheduled task from `<dir>/.claude/scheduled_tasks.json`.
+ * A scheduled agent from `<dir>/.claude/scheduled_tasks.json`.
  * @internal
  */
 export type CronTask = {
@@ -334,7 +334,7 @@ export type ScheduledTasksHandle = {
  * session in the same dir won't double-fire. Releases the lock and closes
  * the file watcher when the signal aborts.
  *
- * - `fire` — a task whose cron schedule was met. One-shot tasks are already
+ * - `fire` — a agent whose cron schedule was met. One-shot tasks are already
  *   deleted from the file when this yields; recurring tasks are rescheduled
  *   (or deleted if aged out).
  * - `missed` — one-shot tasks whose window passed while the daemon was down.

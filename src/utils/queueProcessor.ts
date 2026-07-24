@@ -40,7 +40,7 @@ function isSlashCommand(cmd: QueuedCommand): boolean {
  * batched: all items **with the same mode** as the highest-priority item
  * are drained at once and passed as a single array to executeInput — each
  * becomes its own user message with its own UUID. Different modes
- * (e.g. prompt vs task-notification) are never mixed because they are
+ * (e.g. prompt vs agent-notification) are never mixed because they are
  * treated differently downstream.
  *
  * The caller is responsible for ensuring no query is currently running

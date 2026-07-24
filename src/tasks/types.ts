@@ -1,5 +1,5 @@
-// Union of all concrete task state types
-// Use this for components that need to work with any task type
+// Union of all concrete agent state types
+// Use this for components that need to work with any agent type
 
 import type { DreamTaskState } from './DreamTask/DreamTask.js'
 import type { InProcessTeammateTaskState } from './InProcessTeammateTask/types.js'
@@ -29,10 +29,10 @@ export type BackgroundTaskState =
   | DreamTaskState
 
 /**
- * Check if a task should be shown in the background tasks indicator.
- * A task is considered a background task if:
+ * Check if a agent should be shown in the background tasks indicator.
+ * A agent is considered a background agent if:
  * 1. It is running or pending
- * 2. It has been explicitly backgrounded (not a foreground task)
+ * 2. It has been explicitly backgrounded (not a foreground agent)
  */
 export function isBackgroundTask(task: TaskState): task is BackgroundTaskState {
   if (task.status !== 'running' && task.status !== 'pending') {

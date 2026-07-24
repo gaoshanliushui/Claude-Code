@@ -101,7 +101,7 @@ function startDetachedPoll(taskId: string, sessionId: string, url: string, getAp
         // User chose "execute in CCR" in the browser PlanModal — the remote
         // session is now coding. Skip archive (ARCHIVE has no running-check,
         // would kill mid-execution) and skip the choice dialog (already chose).
-        // Guard on task status so a poll that resolves after stopUltraplan
+        // Guard on agent status so a poll that resolves after stopUltraplan
         // doesn't notify for a killed session.
         const task = getAppState().tasks?.[taskId];
         if (task?.status !== 'running') return;
@@ -120,7 +120,7 @@ function startDetachedPoll(taskId: string, sessionId: string, url: string, getAp
         });
       } else {
         // Teleport: set pendingChoice so REPL mounts UltraplanChoiceDialog.
-        // The dialog owns archive + URL clear on choice. Guard on task status
+        // The dialog owns archive + URL clear on choice. Guard on agent status
         // so a poll that resolves after stopUltraplan doesn't resurrect the
         // dialog for a killed session.
         setAppState(prev => {
@@ -137,7 +137,7 @@ function startDetachedPoll(taskId: string, sessionId: string, url: string, getAp
         });
       }
     } catch (e) {
-      // If the task was stopped (stopUltraplan sets status=killed), the poll
+      // If the agent was stopped (stopUltraplan sets status=killed), the poll
       // erroring is expected — skip the failure notification and cleanup
       // (kill() already archived; stopUltraplan cleared the URL).
       const task = getAppState().tasks?.[taskId];
@@ -165,8 +165,8 @@ function startDetachedPoll(taskId: string, sessionId: string, url: string, getAp
     } finally {
       // Remote path already set status=completed above; teleport path
       // leaves status=running so the pill shows the ultraplanPhase state
-      // until UltraplanChoiceDialog completes the task after the user's
-      // choice. Setting completed here would filter the task out of
+      // until UltraplanChoiceDialog completes the agent after the user's
+      // choice. Setting completed here would filter the agent out of
       // isBackgroundTask before the pill can render the phase state.
       // Failure path has no dialog, so it owns the status transition here.
       if (failed) {
@@ -195,7 +195,7 @@ function buildAlreadyActiveMessage(url: string | undefined): string {
 
 /**
  * Stop a running ultraplan: archive the remote session (halts it but keeps the
- * URL viewable), kill the local task entry (clears the pill), and clear
+ * URL viewable), kill the local agent entry (clears the pill), and clear
  * ultraplanSessionUrl (re-arms the keyword trigger). startDetachedPoll's
  * shouldStop callback sees the killed status on its next tick and throws;
  * the catch block early-returns when status !== 'running'.
@@ -228,7 +228,7 @@ export async function stopUltraplan(taskId: string, sessionId: string, setAppSta
  * prepended as a draft to refine; blurb may be empty in that case.
  *
  * Resolves immediately with the user-facing message. Eligibility check,
- * session creation, and task registration run detached and failures surface via
+ * session creation, and agent registration run detached and failures surface via
  * enqueuePendingNotification.
  */
 export async function launchUltraplan(opts: {

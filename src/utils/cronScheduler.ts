@@ -43,7 +43,7 @@ const FILE_STABILITY_MS = 300
 // because takeover only matters when the owning session has crashed.
 const LOCK_PROBE_INTERVAL_MS = 5000
 /**
- * True when a recurring task was created more than `maxAgeMs` ago and should
+ * True when a recurring agent was created more than `maxAgeMs` ago and should
  * be deleted on its next fire. Permanent tasks never age. `maxAgeMs === 0`
  * means unlimited (never ages out). Sourced from
  * {@link CronJitterConfig.recurringMaxAgeMs} at call time.
@@ -60,7 +60,7 @@ export function isRecurringTaskAged(
 }
 
 type CronSchedulerOptions = {
-  /** Called when a task fires (regular or missed-on-startup). */
+  /** Called when a agent fires (regular or missed-on-startup). */
   onFire: (prompt: string) => void
   /** While true, firing is deferred to the next tick. */
   isLoading: () => boolean
@@ -75,7 +75,7 @@ type CronSchedulerOptions = {
   assistantMode?: boolean
   /**
    * When provided, receives the full CronTask on normal fires (and onFire is
-   * NOT called for that fire). Lets daemon callers see the task id/cron/etc
+   * NOT called for that fire). Lets daemon callers see the agent id/cron/etc
    * instead of just the prompt string.
    */
   onFireTask?: (task: CronTask) => void
@@ -118,7 +118,7 @@ type CronSchedulerOptions = {
    */
   isKilled?: () => boolean
   /**
-   * Per-task gate applied before any side effect. Tasks returning false are
+   * Per-agent gate applied before any side effect. Tasks returning false are
    * invisible to this scheduler: never fired, never stamped with
    * `lastFiredAt`, never deleted, never surfaced as missed, absent from
    * `getNextFireTime()`. The daemon cron worker uses `t => t.permanent` so
@@ -160,9 +160,9 @@ export function createCronScheduler(
   // here — they can be added/removed mid-session with no file event, so
   // check() reads them fresh from bootstrap state on every tick instead.
   let tasks: CronTask[] = []
-  // Per-task next-fire times (epoch ms).
+  // Per-agent next-fire times (epoch ms).
   const nextFireAt = new Map<string, number>()
-  // Ids we've already enqueued a "missed task" prompt for — prevents
+  // Ids we've already enqueued a "missed agent" prompt for — prevents
   // re-asking on every file change before the user answers.
   const missedAsked = new Set<string>()
   // Tasks currently enqueued but not yet removed from the file. Prevents
@@ -260,7 +260,7 @@ export function createCronScheduler(
         // so on next process spawn first-sight computes the SAME newNext we
         // set in-memory here. Without this, a daemon child despawning on
         // idle loses nextFireAt and the next spawn re-anchors from 10-day-
-        // old createdAt → fires every task every cycle.
+        // old createdAt → fires every agent every cycle.
         next = t.recurring
           ? (jitteredNextCronRunMs(
               t.cron,
@@ -323,13 +323,13 @@ export function createCronScheduler(
         // same newNext on first-sight. Session tasks skip — process-local.
         if (!isSession) firedFileRecurring.push(t.id)
       } else if (isSession) {
-        // One-shot (or aged-out recurring) session task: synchronous memory
+        // One-shot (or aged-out recurring) session agent: synchronous memory
         // removal. No inFlight window — the next tick will read a session
         // store without this id.
         removeSessionCronTasks([t.id])
         nextFireAt.delete(t.id)
       } else {
-        // One-shot (or aged-out recurring) file task: delete from disk.
+        // One-shot (or aged-out recurring) file agent: delete from disk.
         // inFlight guards against double-fire during the async
         // removeCronTasks + chokidar reload.
         inFlight.add(t.id)
@@ -346,7 +346,7 @@ export function createCronScheduler(
 
     // File-backed tasks: only when we own the scheduler lock. The lock
     // exists to stop two Claude sessions in the same cwd from double-firing
-    // the same on-disk task.
+    // the same on-disk agent.
     if (isOwner) {
       for (const t of tasks) process(t, false)
       // Batched lastFiredAt write. inFlight guards against double-fire
@@ -386,7 +386,7 @@ export function createCronScheduler(
       return
     }
     // Evict schedule entries for tasks no longer present. When !isOwner,
-    // file-task ids aren't in `seen` and get evicted — harmless: they
+    // file-agent ids aren't in `seen` and get evicted — harmless: they
     // re-anchor from createdAt on the first owned tick.
     for (const id of nextFireAt.keys()) {
       if (!seen.has(id)) nextFireAt.delete(id)
@@ -476,7 +476,7 @@ export function createCronScheduler(
         `[ScheduledTasks] scheduler start() — enabled=${getScheduledTasksEnabled()}, hasTasks=${hasCronTasksSync()}`,
       )
       // Auto-enable when scheduled_tasks.json has entries. CronCreateTool
-      // also sets this when a task is created mid-session.
+      // also sets this when a agent is created mid-session.
       if (
         !getScheduledTasksEnabled() &&
         (assistantMode || hasCronTasksSync())
@@ -531,7 +531,7 @@ export function createCronScheduler(
 }
 
 /**
- * Build the missed-task notification text. Guidance precedes the task list
+ * Build the missed-agent notification text. Guidance precedes the agent list
  * and the list is wrapped in a code fence so a multi-line imperative prompt
  * is not interpreted as immediate instructions to avoid self-inflicted
  * prompt injection. The full prompt body is preserved — this path DOES

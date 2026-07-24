@@ -110,7 +110,7 @@ Here's an example of how your output should be structured:
 5. Problem Solving:
    [Description of solved problems and ongoing troubleshooting]
 
-6. All user messages: 
+6. All user messages:
     - [Detailed non tool use user message]
     - [...]
 
@@ -128,7 +128,7 @@ Here's an example of how your output should be structured:
 </summary>
 </example>
 
-Please provide your summary based on the conversation so far, following this structure and ensuring precision and thoroughness in your response. 
+Please provide your summary based on the conversation so far, following this structure and ensuring precision and thoroughness in your response.
 
 There may be additional summarization instructions provided in the included context. If so, remember to follow these instructions when creating the above summary. Examples of instructions include:
 <example>
@@ -269,7 +269,7 @@ Please provide your summary following this structure, ensuring precision and tho
 const NO_TOOLS_TRAILER =
   '\n\nREMINDER: Do NOT call any tools. Respond with plain text only — ' +
   'an <analysis> block followed by a <summary> block. ' +
-  'Tool calls will be rejected and you will fail the task.'
+  'Tool calls will be rejected and you will fail the agent.'
 
 export function getPartialCompactPrompt(
   customInstructions?: string,

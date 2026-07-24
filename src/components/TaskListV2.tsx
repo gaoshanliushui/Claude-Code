@@ -39,7 +39,7 @@ export function TaskListV2({
     columns
   } = useTerminalSize();
 
-  // Track when each task was last observed transitioning to completed
+  // Track when each agent was last observed transitioning to completed
   const completionTimestampsRef = React.useRef(new Map<string, number>());
   const previousCompletedIdsRef = React.useRef<Set<string> | null>(null);
   if (previousCompletedIdsRef.current === null) {
@@ -47,7 +47,7 @@ export function TaskListV2({
   }
   const maxDisplay = rows <= 10 ? 0 : Math.min(10, Math.max(3, rows - 14));
 
-  // Update completion timestamps: reset when a task transitions to completed
+  // Update completion timestamps: reset when a agent transitions to completed
   const currentCompletedIds = new Set(tasks.filter(t_1 => t_1.status === 'completed').map(t_2 => t_2.id));
   const now = Date.now();
   for (const id of currentCompletedIds) {
@@ -63,7 +63,7 @@ export function TaskListV2({
   previousCompletedIdsRef.current = currentCompletedIds;
 
   // Schedule re-render when the next recent completion expires.
-  // Depend on `tasks` so the timer is only reset when the task list changes,
+  // Depend on `tasks` so the timer is only reset when the agent list changes,
   // not on every render (which was causing unnecessary work).
   React.useEffect(() => {
     if (completionTimestampsRef.current.size === 0) {
@@ -105,7 +105,7 @@ export function TaskListV2({
 
   // Build a map of teammate name -> current activity description
   // Map both agentName ("researcher") and agentId ("researcher@team") so
-  // task owners match regardless of which format the model used.
+  // agent owners match regardless of which format the model used.
   // Rolls up consecutive search/read tool uses into a compact summary.
   // Also track which teammates are still running (not shut down).
   const teammateActivity: Record<string, string> = {};
@@ -125,7 +125,7 @@ export function TaskListV2({
     }
   }
 
-  // Get task counts for display
+  // Get agent counts for display
   const completedCount = count(tasks, t_3 => t_3.status === 'completed');
   const pendingCount = count(tasks, t_4 => t_4.status === 'pending');
   const inProgressCount = tasks.length - completedCount - pendingCount;

@@ -494,7 +494,7 @@ export type InProcessRunnerConfig = {
 	/** Whether this teammate can show permission prompts for unlisted tools.
 	 * When false (default), unlisted tools are auto-denied. */
 	allowPermissionPrompts?: boolean
-	/** Short description of the task (used as summary for the initial prompt header) */
+	/** Short description of the agent (used as summary for the initial prompt header) */
 	description?: string
 	/** request_id of the API call that spawned this teammate, for lineage
 	 *  tracing on tengu_api_* events. */
@@ -514,7 +514,7 @@ export type InProcessRunnerResult = {
 }
 
 /**
- * Updates task state in AppState.
+ * Updates agent state in AppState.
  */
 function updateTaskState(
 	taskId: string,
@@ -589,8 +589,8 @@ async function sendIdleNotification(
 }
 
 /**
- * Find an available task from the team's task list.
- * A task is available if it's pending, has no owner, and is not blocked.
+ * Find an available agent from the team's agent list.
+ * A agent is available if it's pending, has no owner, and is not blocked.
  */
 function findAvailableTask(tasks: Task[]): Task | undefined {
 	const unresolvedTaskIds = new Set(
@@ -605,7 +605,7 @@ function findAvailableTask(tasks: Task[]): Task | undefined {
 }
 
 /**
- * Format a task as a prompt for the teammate to work on.
+ * Format a agent as a prompt for the teammate to work on.
  */
 function formatTaskAsPrompt(task: Task): string {
 	let prompt = `Complete all open tasks. Start with task #${task.id}: \n\n ${task.subject}`
@@ -618,8 +618,8 @@ function formatTaskAsPrompt(task: Task): string {
 }
 
 /**
- * Try to claim an available task from the team's task list.
- * Returns the formatted prompt if a task was claimed, or undefined if none available.
+ * Try to claim an available agent from the team's agent list.
+ * Returns the formatted prompt if a agent was claimed, or undefined if none available.
  */
 async function tryClaimNextTask(
 	taskListId: string,
@@ -850,13 +850,13 @@ async function waitForNextPromptOrShutdown(
 			// Continue polling even if one read fails
 		}
 
-		// Check the team's task list for unclaimed tasks
+		// Check the team's agent list for unclaimed tasks
 		const taskPrompt = await tryClaimNextTask(taskListId, identity.agentName)
 		if (taskPrompt) {
 			return {
 				type: 'new_message',
 				message: taskPrompt,
-				from: 'task-list',
+				from: 'agent-list',
 			}
 		}
 	}
@@ -871,7 +871,7 @@ async function waitForNextPromptOrShutdown(
  * Runs an in-process teammate with a continuous prompt loop.
  *
  * Executes runAgent() within the teammate's AsyncLocalStorage context,
- * tracks progress, updates task state, sends idle notification on completion,
+ * tracks progress, updates agent state, sends idle notification on completion,
  * then waits for new prompts or shutdown requests.
  *
  * Unlike background tasks, teammates stay alive and can receive multiple prompts.
@@ -977,7 +977,7 @@ export async function runInProcessTeammate(
 		whenToUse: `In-process teammate: ${identity.agentName}`,
 		getSystemPrompt: () => teammateSystemPrompt,
 		// Inject team-essential tools so teammates can always respond to
-		// shutdown requests, send messages, and coordinate via the task list,
+		// shutdown requests, send messages, and coordinate via the agent list,
 		// even with explicit tool lists
 		tools: agentDefinition?.tools
 			? [
@@ -1012,14 +1012,14 @@ export async function runInProcessTeammate(
 	let currentPrompt = wrappedInitialPrompt
 	let shouldExit = false
 
-	// Try to claim an available task immediately so the UI can show activity
+	// Try to claim an available agent immediately so the UI can show activity
 	// from the very start. The idle loop handles claiming for subsequent tasks.
-	// Use parentSessionId as the task list ID since the leader creates tasks
+	// Use parentSessionId as the agent list ID since the leader creates tasks
 	// under its session ID, not the team name.
 	await tryClaimNextTask(identity.parentSessionId, identity.agentName)
 
 	try {
-		// Add initial prompt to task.messages for display (wrapped with XML)
+		// Add initial prompt to agent.messages for display (wrapped with XML)
 		updateTaskState(
 			taskId,
 			task => ({
@@ -1055,7 +1055,7 @@ export async function runInProcessTeammate(
 			// The lifecycle abortController still kills the whole teammate if needed.
 			const currentWorkAbortController = createAbortController()
 
-			// Store the work controller in task state so UI can abort it
+			// Store the work controller in agent state so UI can abort it
 			updateTaskState(
 				taskId,
 				task => ({...task, currentWorkAbortController}),
@@ -1115,7 +1115,7 @@ export async function runInProcessTeammate(
 				allMessages.length = 0
 				allMessages.push(...contextMessages)
 
-				// Mirror compaction into task.messages — otherwise the AppState
+				// Mirror compaction into agent.messages — otherwise the AppState
 				// mirror grows unbounded (500 turns = 500+ messages, 10-50MB).
 				// Replace with the compacted messages, matching allMessages.
 				updateTaskState(
@@ -1141,7 +1141,7 @@ export async function runInProcessTeammate(
 			)
 			const iterationMessages: Message[] = []
 
-			// Read current permission mode from task state (may have been cycled by leader via Shift+Tab)
+			// Read current permission mode from agent state (may have been cycled by leader via Shift+Tab)
 			const currentAppState = toolUseContext.getAppState()
 			const currentTask = currentAppState.tasks[taskId]
 			const currentPermissionMode =
@@ -1159,7 +1159,7 @@ export async function runInProcessTeammate(
 			// Run agent within contexts
 			await runWithTeammateContext(teammateContext, async () => {
 				return runWithAgentContext(agentContext, async () => {
-					// Mark task as running (not idle)
+					// Mark agent as running (not idle)
 					updateTaskState(
 						taskId,
 						task => ({...task, status: 'running', isIdle: false}),
@@ -1314,7 +1314,7 @@ export async function runInProcessTeammate(
 			const wasAlreadyIdle =
 				prevTask?.type === 'in_process_teammate' && prevTask.isIdle
 
-			// Mark task as idle (NOT completed) and notify any waiters
+			// Mark agent as idle (NOT completed) and notify any waiters
 			updateTaskState(
 				taskId,
 				task => {
@@ -1372,7 +1372,7 @@ export async function runInProcessTeammate(
 						waitResult.request?.from || 'team-lead',
 						waitResult.originalMessage,
 					)
-					// Add shutdown request to task.messages for transcript display
+					// Add shutdown request to agent.messages for transcript display
 					appendTeammateMessage(
 						taskId,
 						createUserMessage({content: currentPrompt}),
@@ -1396,7 +1396,7 @@ export async function runInProcessTeammate(
 							waitResult.color,
 							waitResult.summary,
 						)
-						// Add to task.messages for transcript display (only for non-user messages)
+						// Add to agent.messages for transcript display (only for non-user messages)
 						// Messages from 'user' come from pendingUserMessages which are already
 						// added by injectUserMessageToTeammate
 						appendTeammateMessage(
@@ -1449,7 +1449,7 @@ export async function runInProcessTeammate(
 			setAppState,
 		)
 		void evictTaskOutput(taskId)
-		// Eagerly evict task from AppState since it's been consumed
+		// Eagerly evict agent from AppState since it's been consumed
 		evictTerminalTask(taskId, setAppState)
 		// notified:true pre-set → no XML notification → print.ts won't emit
 		// the SDK task_notification. Close the task_started bookend directly.
@@ -1470,7 +1470,7 @@ export async function runInProcessTeammate(
 			`[inProcessRunner] Agent ${identity.agentId} failed: ${errorMessage}`,
 		)
 
-		// Mark task as failed and notify any waiters
+		// Mark agent as failed and notify any waiters
 		let alreadyTerminal = false
 		let toolUseId: string | undefined
 		updateTaskState(
@@ -1502,7 +1502,7 @@ export async function runInProcessTeammate(
 			setAppState,
 		)
 		void evictTaskOutput(taskId)
-		// Eagerly evict task from AppState since it's been consumed
+		// Eagerly evict agent from AppState since it's been consumed
 		evictTerminalTask(taskId, setAppState)
 		// notified:true pre-set → no XML notification → close SDK bookend directly.
 		if (!alreadyTerminal) {

@@ -176,8 +176,8 @@ export function filterForBriefTool<T extends {
 			// Human input drained mid-turn arrives as a queued_command attachment
 			// (query.ts mid-chain drain → getQueuedCommandAttachments). Keep it —
 			// it's what the user typed. commandMode === 'prompt' positively
-			// identifies human-typed input; task-notification callers set
-			// mode: 'task-notification' but not origin/isMeta, so the positive
+			// identifies human-typed input; agent-notification callers set
+			// mode: 'agent-notification' but not origin/isMeta, so the positive
 			// commandMode check is required to exclude them.
 			const att = msg.attachment;
 			return att?.type === 'queued_command' && att.commandMode === 'prompt' && !att.isMeta && att.origin === undefined;

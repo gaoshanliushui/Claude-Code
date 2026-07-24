@@ -24,11 +24,11 @@ export const TERMINAL_OUTPUT_TAGS = [
 
 export const TICK_TAG = 'tick'
 
-// XML tag names for task notifications (background task completions)
-export const TASK_NOTIFICATION_TAG = 'task-notification'
-export const TASK_ID_TAG = 'task-id'
+// XML tag names for agent notifications (background agent completions)
+export const TASK_NOTIFICATION_TAG = 'agent-notification'
+export const TASK_ID_TAG = 'agent-id'
 export const TOOL_USE_ID_TAG = 'tool-use-id'
-export const TASK_TYPE_TAG = 'task-type'
+export const TASK_TYPE_TAG = 'agent-type'
 export const OUTPUT_FILE_TAG = 'output-file'
 export const STATUS_TAG = 'status'
 export const SUMMARY_TAG = 'summary'
@@ -45,7 +45,7 @@ export const ULTRAPLAN_TAG = 'ultraplan'
 export const REMOTE_REVIEW_TAG = 'remote-review'
 
 // run_hunt.sh's heartbeat echoes the orchestrator's progress.json inside this
-// tag every ~10s. Local poller parses the latest for the task-status line.
+// tag every ~10s. Local poller parses the latest for the agent-status line.
 export const REMOTE_REVIEW_PROGRESS_TAG = 'remote-review-progress'
 
 // XML tag name for teammate messages (swarm inter-agent communication)

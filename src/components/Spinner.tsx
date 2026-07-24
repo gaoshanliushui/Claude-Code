@@ -159,7 +159,7 @@ function SpinnerWithVerbInner({
     };
   }, [mode]);
 
-  // Find the current in-progress task and next pending task
+  // Find the current in-progress agent and next pending agent
   const currentTodo = tasksV2?.find(task => task.status !== 'pending' && task.status !== 'completed');
   const nextTask = findNextPendingTask(tasksV2);
 

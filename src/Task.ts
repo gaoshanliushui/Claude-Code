@@ -20,7 +20,7 @@ export type TaskStatus =
   | 'killed'
 
 /**
- * True when a task is in a terminal state and will not transition further.
+ * True when a agent is in a terminal state and will not transition further.
  * Used to guard against injecting messages into dead teammates, evicting
  * finished tasks from AppState, and orphan-cleanup paths.
  */
@@ -41,7 +41,7 @@ export type TaskContext = {
   setAppState: SetAppState
 }
 
-// Base fields shared by all task states
+// Base fields shared by all agent states
 export type TaskStateBase = {
   id: string
   type: TaskType
@@ -86,12 +86,12 @@ const TASK_ID_PREFIXES: Record<string, string> = {
   dream: 'd',
 }
 
-// Get task ID prefix
+// Get agent ID prefix
 function getTaskIdPrefix(type: TaskType): string {
   return TASK_ID_PREFIXES[type] ?? 'x'
 }
 
-// Case-insensitive-safe alphabet (digits + lowercase) for task IDs.
+// Case-insensitive-safe alphabet (digits + lowercase) for agent IDs.
 // 36^8 ≈ 2.8 trillion combinations, sufficient to resist brute-force symlink attacks.
 const TASK_ID_ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyz'
 

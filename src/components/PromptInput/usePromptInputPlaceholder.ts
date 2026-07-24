@@ -44,7 +44,7 @@ export function usePromptInputPlaceholder({
     }
 
     // Show queue hint if user has not seen it yet.
-    // Only count user-editable commands — task-notification and isMeta
+    // Only count user-editable commands — agent-notification and isMeta
     // are hidden from the prompt area (see PromptInputQueuedCommands).
     if (
       queuedCommands.some(isQueuedCommandEditable) &&

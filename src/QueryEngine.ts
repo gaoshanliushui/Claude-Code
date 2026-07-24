@@ -475,7 +475,7 @@ export class QueryEngine {
 				(msg.type === 'user' &&
 					!msg.isMeta && // Skip synthetic caveat messages
 					!msg.toolUseResult && // Skip tool results (they'll be acked from query)
-					messageSelector().selectableUserMessagesFilter(msg)) || // Skip non-user-authored messages (task notifications, etc.)
+					messageSelector().selectableUserMessagesFilter(msg)) || // Skip non-user-authored messages (agent notifications, etc.)
 				(msg.type === 'system' && msg.subtype === 'compact_boundary'), // Always ack compact boundaries
 		)
 		const messagesToAck = replayUserMessages ? replayableMessages : []

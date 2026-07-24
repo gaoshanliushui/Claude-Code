@@ -17,7 +17,7 @@ import {DESCRIPTION, getPrompt} from './prompt.js'
 
 const inputSchema = lazySchema(() =>
 	z.strictObject({
-		subject: z.string().describe('A brief title for the task'),
+		subject: z.string().describe('A brief title for the agent'),
 		description: z.string().describe('What needs to be done'),
 		activeForm: z
 			.string()
@@ -28,7 +28,7 @@ const inputSchema = lazySchema(() =>
 		metadata: z
 			.record(z.string(), z.unknown())
 			.optional()
-			.describe('Arbitrary metadata to attach to the task'),
+			.describe('Arbitrary metadata to attach to the agent'),
 	}),
 )
 type InputSchema = ReturnType<typeof inputSchema>
@@ -47,7 +47,7 @@ export type Output = z.infer<OutputSchema>
 
 export const TaskCreateTool = buildTool({
 	name: TASK_CREATE_TOOL_NAME,
-	searchHint: 'create a task in the task list',
+	searchHint: 'create a agent in the agent list',
 	maxResultSizeChars: 100_000,
 	async description() {
 		return DESCRIPTION
@@ -112,7 +112,7 @@ export const TaskCreateTool = buildTool({
 			throw new Error(blockingErrors.join('\n'))
 		}
 
-		// Auto-expand task list when creating tasks
+		// Auto-expand agent list when creating tasks
 		context.setAppState(prev => {
 			if (prev.expandedView === 'tasks') return prev
 			return {...prev, expandedView: 'tasks' as const}

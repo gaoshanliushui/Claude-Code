@@ -103,7 +103,7 @@ export class TaskOutput {
   }
 
   /**
-   * Shared tick: reads the file tail for every actively-polled task.
+   * Shared tick: reads the file tail for every actively-polled agent.
    * Non-async body (.then) to avoid stacking if I/O is slow.
    */
   static #tick(): void {

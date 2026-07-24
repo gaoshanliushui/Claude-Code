@@ -179,8 +179,8 @@ export const TeamCreateTool: Tool<InputSchema, Output> = buildTool({
 		// unless explicitly TeamDelete'd (gh-32730).
 		registerTeamForSessionCleanup(finalTeamName)
 
-		// Reset and create the corresponding task list directory (Team = Project = TaskList)
-		// This ensures task numbering starts fresh at 1 for each new swarm
+		// Reset and create the corresponding agent list directory (Team = Project = TaskList)
+		// This ensures agent numbering starts fresh at 1 for each new swarm
 		const taskListId = sanitizeName(finalTeamName)
 		await resetTaskList(taskListId)
 		await ensureTasksDir(taskListId)

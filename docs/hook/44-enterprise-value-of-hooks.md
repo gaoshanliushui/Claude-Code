@@ -372,7 +372,7 @@ fi
     "Stop": [{
       "hooks": [{
         "type": "agent",
-        "prompt": "Look at the conversation transcript. The user's original task was: $ARGUMENTS. Verify that every explicit requirement was addressed. Return {\"ok\": true} or {\"ok\": false, \"reason\": \"<what's missing>\"}.",
+        "prompt": "Look at the conversation transcript. The user's original agent was: $ARGUMENTS. Verify that every explicit requirement was addressed. Return {\"ok\": true} or {\"ok\": false, \"reason\": \"<what's missing>\"}.",
         "model": "sonnet"
       }]
     }]

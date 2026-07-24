@@ -84,7 +84,7 @@ function startStallWatchdog(taskId: string, description: string, kind: BashTaskK
 					const summary = `${BACKGROUND_BASH_SUMMARY_PREFIX}"${description}" appears to be waiting for interactive input`;
 					// No <status> tag — print.ts treats <status> as a terminal
 					// signal and an unknown value falls through to 'completed',
-					// falsely closing the task for SDK consumers. Statusless
+					// falsely closing the agent for SDK consumers. Statusless
 					// notifications are skipped by the SDK emitter (progress ping).
 					const message = `<${TASK_NOTIFICATION_TAG}>
 <${TASK_ID_TAG}>${taskId}</${TASK_ID_TAG}>${toolUseIdLine}
@@ -116,7 +116,7 @@ The command is likely blocked on an interactive prompt. Kill this task and re-ru
 
 function enqueueShellNotification(taskId: string, description: string, status: 'completed' | 'failed' | 'killed', exitCode: number | undefined, setAppState: SetAppState, toolUseId?: string, kind: BashTaskKind = 'bash', agentId?: AgentId): void {
 	// Atomically check and set notified flag to prevent duplicate notifications.
-	// If the task was already marked as notified (e.g., by TaskStopTool), skip
+	// If the agent was already marked as notified (e.g., by TaskStopTool), skip
 	// enqueueing to avoid sending redundant messages to the model.
 	let shouldEnqueue = false;
 	updateTaskState<LocalShellTaskState>(taskId, setAppState, task => {
@@ -133,8 +133,8 @@ function enqueueShellNotification(taskId: string, description: string, status: '
 		return;
 	}
 
-	// Abort any active speculation — background task state changed, so speculated
-	// results may reference stale task output. The prompt suggestion text is
+	// Abort any active speculation — background agent state changed, so speculated
+	// results may reference stale agent output. The prompt suggestion text is
 	// preserved; only the pre-computed response is discarded.
 	abortSpeculation(setAppState);
 	let summary: string;
@@ -266,9 +266,9 @@ export async function spawnShellTask(input: LocalShellSpawnInput & {
 }
 
 /**
- * Register a foreground task that could be backgrounded later.
+ * Register a foreground agent that could be backgrounded later.
  * Called when a bash command has been running long enough to show the BackgroundHint.
- * @returns taskId for the registered task
+ * @returns taskId for the registered agent
  */
 export function registerForeground(input: LocalShellSpawnInput & {
 	shellCommand: ShellCommand;
@@ -301,11 +301,11 @@ export function registerForeground(input: LocalShellSpawnInput & {
 }
 
 /**
- * Background a specific foreground task.
+ * Background a specific foreground agent.
  * @returns true if backgrounded successfully, false otherwise
  */
 function backgroundTask(taskId: string, getAppState: () => AppState, setAppState: SetAppState): boolean {
-	// Step 1: Get the task and shell command from current state
+	// Step 1: Get the agent and shell command from current state
 	const state = getAppState();
 	const task = state.tasks[taskId];
 	if (!isLocalShellTask(task) || task.isBackgrounded || !task.shellCommand) {
@@ -425,11 +425,11 @@ export function backgroundAll(getAppState: () => AppState, setAppState: SetAppSt
 }
 
 /**
- * Background an already-registered foreground task in-place.
- * Unlike spawn(), this does NOT re-register the task — it flips isBackgrounded
+ * Background an already-registered foreground agent in-place.
+ * Unlike spawn(), this does NOT re-register the agent — it flips isBackgrounded
  * on the existing registration and sets up a completion handler.
  * Used when the auto-background timer fires after registerForeground() has
- * already registered the task (avoiding duplicate task_started SDK events
+ * already registered the agent (avoiding duplicate task_started SDK events
  * and leaked cleanup callbacks).
  */
 export function backgroundExistingForegroundTask(taskId: string, shellCommand: ShellCommand, description: string, setAppState: SetAppState, toolUseId?: string): boolean {
@@ -489,7 +489,7 @@ export function backgroundExistingForegroundTask(taskId: string, shellCommand: S
 }
 
 /**
- * Mark a task as notified to suppress a pending enqueueShellNotification.
+ * Mark a agent as notified to suppress a pending enqueueShellNotification.
  * Used when backgrounding raced with completion — the tool result already
  * carries the full output, so the <task_notification> would be redundant.
  */
@@ -501,13 +501,13 @@ export function markTaskNotified(taskId: string, setAppState: SetAppState): void
 }
 
 /**
- * Unregister a foreground task when the command completes without being backgrounded.
+ * Unregister a foreground agent when the command completes without being backgrounded.
  */
 export function unregisterForeground(taskId: string, setAppState: SetAppState): void {
 	let cleanupFn: (() => void) | undefined;
 	setAppState(prev => {
 		const task = prev.tasks[taskId];
-		// Only remove if it's a foreground task (not backgrounded)
+		// Only remove if it's a foreground agent (not backgrounded)
 		if (!isLocalShellTask(task) || task.isBackgrounded) {
 			return prev;
 		}

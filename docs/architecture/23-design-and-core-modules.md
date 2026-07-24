@@ -892,13 +892,13 @@ src/
 | 想深入 | 看 |
 |--------|------|
 | queryLoop 主循环 | [`docs/09-query.md`](../09-query.md) |
-| Agent 派发 | [`docs/12-run-agent.md`](../task/12-run-agent.md) |
+| Agent 派发 | [`docs/12-run-agent.md`](../agent/12-run-agent.md) |
 | 工具执行 | [`docs/11-tool-execution.md`](../tool/11-tool-execution.md) |
 | Skill 系统 | [`docs/13-skill-tool.md`](../skill/13-skill-tool.md) |
 | 钩子机制 | [`docs/14-tool-hooks.md`](../tool/14-tool-hooks.md) + [`docs/15-utils-hooks.md`](../hook/15-utils-hooks.md) |
 | Anthropic API | [`docs/16-claude-api.md`](../16-claude-api.md) |
 | 整体架构与设计哲学 | [`docs/17-architecture.md`](17-architecture.md) |
-| 任务规划 | [`docs/18-task-planning.md`](../task/18-task-planning.md) |
-| 多 agent 编排 | [`docs/19-orchestration.md`](../task/19-orchestration.md) |
+| 任务规划 | [`docs/18-task-planning.md`](../agent/18-task-planning.md) |
+| 多 agent 编排 | [`docs/19-orchestration.md`](../agent/19-orchestration.md) |
 | 请求流 | [`docs/20-request-flow.md`](20-request-flow.md) |
 | 隐藏功能 / feature gate | [`docs/05-hidden-commands.md`](../other/05-hidden-commands.md) + [`docs/07-feature-gates.md`](../other/07-feature-gates.md) |

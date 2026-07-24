@@ -156,7 +156,7 @@ export type AppState = DeepImmutable<{
 	// Always-on bridge: first-time remote dialog pending (set by /remote-control command)
 	showRemoteCallout: boolean
 }> & {
-	// Unified task state - excluded from DeepImmutable because TaskState contains function types
+	// Unified agent state - excluded from DeepImmutable because TaskState contains function types
 	tasks: { [taskId: string]: TaskState }
 	// Name → AgentId registry populated by Agent tool when `name` is provided.
 	// Latest-wins on collision. Used by SendMessage to route by name.

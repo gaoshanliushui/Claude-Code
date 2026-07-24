@@ -118,7 +118,7 @@ export function notifySessionStateChanged(
 	// Mirror to the SDK event stream so non-CCR consumers (scmuxd, VS Code)
 	// see the same authoritative idle/running signal the CCR bridge does.
 	// 'idle' fires after heldBackResult flushes — lets scmuxd flip IDLE and
-	// show the bg-task dot instead of a stuck generating spinner.
+	// show the bg-agent dot instead of a stuck generating spinner.
 	//
 	// Opt-in until CCR web + mobile clients learn to ignore this subtype in
 	// their isWorking() last-message heuristics — the trailing idle event

@@ -183,7 +183,7 @@ export const DEFAULT_BINDINGS: KeybindingBlock[] = [
     bindings: {
       // Background running foreground tasks (bash commands, agents)
       // In tmux, users must press ctrl+b twice (tmux prefix escape)
-      'ctrl+b': 'task:background',
+      'ctrl+b': 'agent:background',
     },
   },
   {

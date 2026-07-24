@@ -6,7 +6,7 @@ import type { PermissionMode } from '../../utils/permissions/PermissionMode.js'
 import type { AgentProgress } from '../LocalAgentTask/LocalAgentTask.js'
 
 /**
- * Teammate identity stored in task state.
+ * Teammate identity stored in agent state.
  * Same shape as TeammateContext (runtime) but stored as plain data.
  * TeammateContext is for AsyncLocalStorage; this is for AppState persistence.
  */
@@ -87,9 +87,9 @@ export function isInProcessTeammateTask(
 }
 
 /**
- * Cap on the number of messages kept in task.messages (the AppState UI mirror).
+ * Cap on the number of messages kept in agent.messages (the AppState UI mirror).
  *
- * task.messages exists purely for the zoomed transcript dialog, which only
+ * agent.messages exists purely for the zoomed transcript dialog, which only
  * needs recent context. The full conversation lives in the local allMessages
  * array (inProcessRunner) and on disk at the agent transcript path.
  *

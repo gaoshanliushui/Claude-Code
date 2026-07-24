@@ -101,7 +101,7 @@ type TitleAndBranch = {
  */
 async function generateTitleAndBranch(description: string, signal: AbortSignal): Promise<TitleAndBranch> {
   const fallbackTitle = truncateToWidth(description, 75);
-  const fallbackBranch = 'claude/task';
+  const fallbackBranch = 'claude/agent';
   try {
     const userPrompt = SESSION_TITLE_AND_BRANCH_PROMPT.replace('{description}', description);
     const response = await queryHaiku({
@@ -873,7 +873,7 @@ export async function teleportToRemote(options: {
         }
       }
       const requestBody = {
-        title: options.title || options.description || 'Remote task',
+        title: options.title || options.description || 'Remote agent',
         events: [],
         session_context: {
           sources: gitSource ? [gitSource] : [],
@@ -931,7 +931,7 @@ export async function teleportToRemote(options: {
       sessionTitle = options.title;
       sessionBranch = options.reuseOutcomeBranch;
     } else {
-      const generated = await generateTitleAndBranch(options.description || initialMessage || 'Background task', signal);
+      const generated = await generateTitleAndBranch(options.description || initialMessage || 'Background agent', signal);
       sessionTitle = options.title || generated.title;
       sessionBranch = options.reuseOutcomeBranch || generated.branchName;
     }

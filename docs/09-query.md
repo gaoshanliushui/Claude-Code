@@ -88,7 +88,7 @@ export type QueryParams = {
   maxOutputTokensOverride?: number    // 单次响应最大 token
   maxTurns?: number                   // 最大轮次
   skipCacheWrite?: boolean            // 跳过 prompt cache 写入
-  // API task_budget（output_config.task_budget，beta task-budgets-2026-03-13）
+  // API task_budget（output_config.task_budget，beta agent-budgets-2026-03-13）
   taskBudget?: { total: number }
   deps?: QueryDeps                    // 测试时可注入 fake
 }
@@ -647,7 +647,7 @@ async function prepareNextLoopTurn({ ... }) {
   const queuedCommandsSnapshot = getCommandsByMaxPriority(sleepRan ? 'later' : 'next').filter(cmd => {
     if (isSlashCommand(cmd)) return false
     if (isMainThread) return cmd.agentId === undefined
-    return cmd.mode === 'task-notification' && cmd.agentId === currentAgentId
+    return cmd.mode === 'agent-notification' && cmd.agentId === currentAgentId
   })
   for await (const attachment of getAttachmentMessages(null, currentToolUseContext, null, queuedCommandsSnapshot, [...messagesForQuery, ...assistantMessages, ...toolResults], querySource)) {
     yieldedMessages.push(attachment)
@@ -668,7 +668,7 @@ async function prepareNextLoopTurn({ ... }) {
   }
 
   // 5. 消费 command queue（started lifecycle）
-  const consumedCommands = queuedCommandsSnapshot.filter(cmd => cmd.mode === 'prompt' || cmd.mode === 'task-notification')
+  const consumedCommands = queuedCommandsSnapshot.filter(cmd => cmd.mode === 'prompt' || cmd.mode === 'agent-notification')
   if (consumedCommands.length > 0) {
     for (const cmd of consumedCommands) {
       if (cmd.uuid) { consumedCommandUuids.push(cmd.uuid); notifyCommandLifecycle(cmd.uuid, 'started') }
@@ -684,7 +684,7 @@ async function prepareNextLoopTurn({ ... }) {
     }
   }
 
-  // 7. BG_SESSIONS task summary
+  // 7. BG_SESSIONS agent summary
   if (feature('BG_SESSIONS') && !agentId && taskSummaryModule.shouldGenerateTaskSummary()) {
     taskSummaryModule.maybeGenerateTaskSummary({ systemPrompt, userContext, systemContext, toolUseContext, forkContextMessages: [...] })
   }

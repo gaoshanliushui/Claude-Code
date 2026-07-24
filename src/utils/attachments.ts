@@ -545,7 +545,7 @@ export type Attachment =
 	prompt: string | Array<ContentBlockParam>
 	source_uuid?: UUID
 	imagePasteIds?: number[]
-	/** Original queue mode — 'prompt' for user messages, 'task-notification' for system events */
+	/** Original queue mode — 'prompt' for user messages, 'agent-notification' for system events */
 	commandMode?: string
 	/** Provenance carried from QueuedCommand so mid-turn drains preserve it */
 	origin?: MessageOrigin
@@ -755,7 +755,7 @@ export async function getAttachments(
 	) {
 		// query.ts:removeFromQueue dequeues these unconditionally after
 		// getAttachmentMessages runs — returning [] here silently drops them.
-		// Coworker runs with --bare and depends on task-notification for
+		// Coworker runs with --bare and depends on agent-notification for
 		// mid-tool-call notifications from Local*Task/Remote*Task.
 		return getQueuedCommandAttachments(queuedCommands)
 	}
@@ -1042,7 +1042,7 @@ async function maybe<A>(label: string, f: () => Promise<A[]>): Promise<A[]> {
 	}
 }
 
-const INLINE_NOTIFICATION_MODES = new Set(['prompt', 'task-notification'])
+const INLINE_NOTIFICATION_MODES = new Set(['prompt', 'agent-notification'])
 
 export async function getQueuedCommandAttachments(
 	queuedCommands: QueuedCommand[],
@@ -1050,8 +1050,8 @@ export async function getQueuedCommandAttachments(
 	if (!queuedCommands) {
 		return []
 	}
-	// Include both 'prompt' and 'task-notification' commands as attachments.
-	// During proactive agentic loops, task-notification commands would otherwise
+	// Include both 'prompt' and 'agent-notification' commands as attachments.
+	// During proactive agentic loops, agent-notification commands would otherwise
 	// stay in the queue permanently (useQueueProcessor can't run while a query
 	// is active), causing hasPendingNotifications() to return true and Sleep to
 	// wake immediately with 0ms duration in an infinite loop.

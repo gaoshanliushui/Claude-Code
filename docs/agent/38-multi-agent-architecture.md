@@ -219,7 +219,7 @@ disallowedTools: [Write, Edit]
 model: sonnet
 ---
 
-Your task is to review code...
+Your agent is to review code...
 ```
 
 ### 4.3 Agent 加载机制
@@ -252,8 +252,8 @@ const allAgents = mergeAgents(builtinAgents, pluginAgents, markdownAgents, jsonA
 ```ts
 // 基础 schema
 const baseInputSchema = z.object({
-    description: z.string().describe('A short (3-5 word) description of the task'),
-    prompt: z.string().describe('The task for the agent to perform'),
+    description: z.string().describe('A short (3-5 word) description of the agent'),
+    prompt: z.string().describe('The agent for the agent to perform'),
     subagent_type: z.string().optional().describe('The type of specialized agent'),
     model: z.enum(['sonnet', 'opus', 'haiku']).optional(),
     run_in_background: z.boolean().optional(),
@@ -911,7 +911,7 @@ const notificationText = `<task-id>${taskId}</task-id>
 
 // 推入消息队列
 enqueue({
-    mode: 'task-notification',
+    mode: 'agent-notification',
     value: notificationText,
     // ...
 })
@@ -1154,7 +1154,7 @@ export async function* resumeAgent({
 ### 14.2 Task Notification 后的恢复
 
 ```ts
-// 父 agent 收到 task-notification 后
+// 父 agent 收到 agent-notification 后
 // 可以选择：
 // 1. 直接读取结果（如果可以）
 // 2. 调用 SendMessage 继续对话
@@ -1208,7 +1208,7 @@ thinkingConfig: useExactTools
 ```ts
 // 父 agent 可以同时启动多个子 agent
 // 每个子 agent 独立运行
-// 通过 task-notification 机制报告完成
+// 通过 agent-notification 机制报告完成
 ```
 
 ### 15.4 工具过滤

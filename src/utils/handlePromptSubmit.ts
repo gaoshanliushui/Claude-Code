@@ -45,7 +45,7 @@ type BaseExecutionParams = {
 	commands: Command[]
 	queryGuard: QueryGuard
 	/**
-	 * True when external loading (remote session, foregrounded background task)
+	 * True when external loading (remote session, foregrounded background agent)
 	 * is active. These don't route through queryGuard, so the queue check must
 	 * account for them separately. Omit (defaults to false) for the dequeue path
 	 * (executeQueuedInput) — dequeued items were already queued past this check.
@@ -496,14 +496,14 @@ async function executeUserInput(params: ExecuteUserInputParams): Promise<void> {
 				})
 				// Stamp origin here rather than threading another arg through
 				// processUserInput → processUserInputBase → processTextPrompt → createUserMessage.
-				// Derive origin from mode for task-notifications — mirrors the origin
+				// Derive origin from mode for agent-notifications — mirrors the origin
 				// derivation at messages.ts (case 'queued_command'); intentionally
 				// does NOT mirror its isMeta:true so idle-dequeued notifications stay
 				// visible in the transcript via UserAgentNotificationMessage.
 				const origin =
 					cmd.origin ??
 					(cmd.mode === 'task-notification'
-						? ({kind: 'task-notification'} as const)
+						? ({kind: 'agent-notification'} as const)
 						: undefined)
 				if (origin) {
 					for (const m of result.messages) {

@@ -31,24 +31,24 @@ export type CronTask = {
   id: string
   /** 5-field cron string (local time) — validated on write, re-validated on read. */
   cron: string
-  /** Prompt to enqueue when the task fires. */
+  /** Prompt to enqueue when the agent fires. */
   prompt: string
-  /** Epoch ms when the task was created. Anchor for missed-task detection. */
+  /** Epoch ms when the agent was created. Anchor for missed-agent detection. */
   createdAt: number
   /**
    * Epoch ms of the most recent fire. Written back by the scheduler after
    * each recurring fire so next-fire computation survives process restarts.
    * The scheduler anchors first-sight from `lastFiredAt ?? createdAt` — a
-   * never-fired task uses createdAt (correct for pinned crons like
-   * `30 14 27 2 *` whose next-from-now is next year); a fired-before task
+   * never-fired agent uses createdAt (correct for pinned crons like
+   * `30 14 27 2 *` whose next-from-now is next year); a fired-before agent
    * reconstructs the same `nextFireAt` the prior process had in memory.
    * Never set for one-shots (they're deleted on fire).
    */
   lastFiredAt?: number
-  /** When true, the task reschedules after firing instead of being deleted. */
+  /** When true, the agent reschedules after firing instead of being deleted. */
   recurring?: boolean
   /**
-   * When true, the task is exempt from recurringMaxAgeMs auto-expiry.
+   * When true, the agent is exempt from recurringMaxAgeMs auto-expiry.
    * System escape hatch for assistant mode's built-in tasks (catch-up/
    * morning-checkin/dream) — the installer's writeIfMissing() skips existing
    * files so re-install can't recreate them. Not settable via CronCreateTool;
@@ -62,7 +62,7 @@ export type CronTask = {
    */
   durable?: boolean
   /**
-   * Runtime-only. When set, the task was created by an in-process teammate.
+   * Runtime-only. When set, the agent was created by an in-process teammate.
    * The scheduler routes fires to that teammate's queue instead of the main
    * REPL's. Never written to disk (teammate crons are always session-only).
    */
@@ -83,7 +83,7 @@ export function getCronFilePath(dir?: string): string {
 }
 
 /**
- * Read and parse .claude/scheduled_tasks.json. Returns an empty task list if the file
+ * Read and parse .claude/scheduled_tasks.json. Returns an empty agent list if the file
  * is missing, empty, or malformed. Tasks with invalid cron strings are
  * silently dropped (logged at debug level) so a single bad entry never
  * blocks the whole file.
@@ -159,8 +159,8 @@ export function hasCronTasksSync(dir?: string): boolean {
 
 /**
  * Overwrite .claude/scheduled_tasks.json with the given tasks. Creates .claude/ if
- * missing. Empty task list writes an empty file (rather than deleting) so
- * the file watcher sees a change event on last-task-removed.
+ * missing. Empty agent list writes an empty file (rather than deleting) so
+ * the file watcher sees a change event on last-agent-removed.
  */
 export async function writeCronTasks(
   tasks: CronTask[],
@@ -182,10 +182,10 @@ export async function writeCronTasks(
 }
 
 /**
- * Append a task. Returns the generated id. Caller is responsible for having
+ * Append a agent. Returns the generated id. Caller is responsible for having
  * already validated the cron string (the tool does this via validateInput).
  *
- * When `durable` is false the task is held in process memory only
+ * When `durable` is false the agent is held in process memory only
  * (bootstrap/state.ts) — it fires on schedule this session but is never
  * written to .claude/scheduled_tasks.json and dies with the process. The
  * scheduler merges session tasks into its tick loop directly, so no file
@@ -251,7 +251,7 @@ export async function removeCronTasks(
  * Stamp `lastFiredAt` on the given recurring tasks and write back. Batched
  * so N fires in one scheduler tick = one read-modify-write, not N. Only
  * touches file-backed tasks — session tasks die with the process, no point
- * persisting their fire time. No-op if none of the ids match (task was
+ * persisting their fire time. No-op if none of the ids match (agent was
  * deleted between fire and write — e.g. user ran CronDelete mid-tick).
  *
  * Scheduler lock means at most one process calls this; chokidar picks up
@@ -313,14 +313,14 @@ export function nextCronRunMs(cron: string, fromMs: number): number | null {
  * Defaults here preserve the pre-config behavior exactly.
  */
 export type CronJitterConfig = {
-  /** Recurring-task forward delay as a fraction of the interval between fires. */
+  /** Recurring-agent forward delay as a fraction of the interval between fires. */
   recurringFrac: number
   /** Upper bound on recurring forward delay regardless of interval length. */
   recurringCapMs: number
-  /** One-shot backward lead: maximum ms a task may fire early. */
+  /** One-shot backward lead: maximum ms a agent may fire early. */
   oneShotMaxMs: number
   /**
-   * One-shot backward lead: minimum ms a task fires early when the minute-mod
+   * One-shot backward lead: minimum ms a agent fires early when the minute-mod
    * gate matches. 0 = taskIds hashing near zero fire on the exact mark. Raise
    * this to guarantee nobody lands on the wall-clock boundary.
    */
@@ -365,14 +365,14 @@ function jitterFrac(taskId: string): number {
 }
 
 /**
- * Same as {@link nextCronRunMs}, plus a deterministic per-task delay to
+ * Same as {@link nextCronRunMs}, plus a deterministic per-agent delay to
  * avoid a thundering herd when many sessions schedule the same cron string
  * (e.g. `0 * * * *` → everyone hits inference at :00).
  *
  * The delay is proportional to the current gap between fires
  * ({@link CronJitterConfig.recurringFrac}, capped at
- * {@link CronJitterConfig.recurringCapMs}) so at defaults an hourly task
- * spreads across [:00, :06) but a per-minute task only spreads by a few
+ * {@link CronJitterConfig.recurringCapMs}) so at defaults an hourly agent
+ * spreads across [:00, :06) but a per-minute agent only spreads by a few
  * seconds.
  *
  * Only used for recurring tasks. One-shot tasks use
@@ -398,7 +398,7 @@ export function jitteredNextCronRunMs(
 }
 
 /**
- * Same as {@link nextCronRunMs}, minus a deterministic per-task lead time
+ * Same as {@link nextCronRunMs}, minus a deterministic per-agent lead time
  * when the fire time lands on a minute boundary matching
  * {@link CronJitterConfig.oneShotMinuteMod}.
  *
@@ -410,12 +410,12 @@ export function jitteredNextCronRunMs(
  *
  * During an incident, ops can push `tengu_kairos_cron_config` with e.g.
  * `{oneShotMinuteMod: 15, oneShotMaxMs: 300000, oneShotFloorMs: 30000}` to
- * spread :00/:15/:30/:45 fires across a [t-5min, t-30s] window — every task
+ * spread :00/:15/:30/:45 fires across a [t-5min, t-30s] window — every agent
  * gets at least 30 s of lead, so nobody lands on the exact mark.
  *
  * Checks the computed fire time rather than the cron string so
  * `0 15 * * *`, step expressions, and `0,30 9 * * *` all get jitter
- * when they land on a matching minute. Clamped to `fromMs` so a task created
+ * when they land on a matching minute. Clamped to `fromMs` so a agent created
  * inside its own jitter window doesn't fire before it was created.
  */
 export function oneShotJitteredNextCronRunMs(
@@ -440,14 +440,14 @@ export function oneShotJitteredNextCronRunMs(
     cfg.oneShotFloorMs +
     jitterFrac(taskId) * (cfg.oneShotMaxMs - cfg.oneShotFloorMs)
   // t1 > fromMs is guaranteed by nextCronRunMs (strictly after), so the
-  // max() only bites when the task was created inside its own lead window.
+  // max() only bites when the agent was created inside its own lead window.
   return Math.max(t1 - lead, fromMs)
 }
 
 /**
- * A task is "missed" when its next scheduled run (computed from createdAt)
+ * A agent is "missed" when its next scheduled run (computed from createdAt)
  * is in the past. Surfaced to the user at startup. Works for both one-shot
- * and recurring tasks — a recurring task whose window passed while Claude
+ * and recurring tasks — a recurring agent whose window passed while Claude
  * was down is still "missed".
  */
 export function findMissedTasks(tasks: CronTask[], nowMs: number): CronTask[] {

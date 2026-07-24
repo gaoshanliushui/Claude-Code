@@ -93,7 +93,7 @@ export function UserTeammateMessage({
         return <React.Fragment key={index}>{shutdownElement}</React.Fragment>;
       }
 
-      // Try to render as task assignment message
+      // Try to render as agent assignment message
       const taskAssignmentElement = tryRenderTaskAssignmentMessage(msg_0.content);
       if (taskAssignmentElement) {
         return <React.Fragment key={index}>{taskAssignmentElement}</React.Fragment>;
@@ -114,7 +114,7 @@ export function UserTeammateMessage({
         return null;
       }
 
-      // Task completed notification - show which task was completed
+      // Task completed notification - show which agent was completed
       if (parsedIdleNotification?.type === 'task_completed') {
         const taskCompleted = parsedIdleNotification as {
           type: string;

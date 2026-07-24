@@ -1,4 +1,4 @@
-// Shared logic for stopping a running task.
+// Shared logic for stopping a running agent.
 // Used by TaskStopTool (LLM-invoked) and SDK stop_task control request.
 
 import type {AppState} from '../state/AppState.js'
@@ -29,9 +29,9 @@ type StopTaskResult = {
 }
 
 /**
- * Look up a task by ID, validate it is running, kill it, and mark it as notified.
+ * Look up a agent by ID, validate it is running, kill it, and mark it as notified.
  *
- * Throws {@link StopTaskError} when the task cannot be stopped (not found,
+ * Throws {@link StopTaskError} when the agent cannot be stopped (not found,
  * not running, or unsupported type). Callers can inspect `error.code` to
  * distinguish the failure reason.
  */
@@ -85,7 +85,7 @@ export async function stopTask(
 		})
 		// Suppressing the XML notification also suppresses print.ts's parsed
 		// task_notification SDK event — emit it directly so SDK consumers see
-		// the task close.
+		// the agent close.
 		if (suppressed) {
 			emitTaskTerminatedSdk(taskId, 'stopped', {
 				toolUseId: task.toolUseId,

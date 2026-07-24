@@ -250,7 +250,7 @@ const outputSchema = lazySchema(() => z.object({
   isImage: z.boolean().optional().describe('Flag to indicate if stdout contains image data'),
   persistedOutputPath: z.string().optional().describe('Path to persisted full output when too large for inline'),
   persistedOutputSize: z.number().optional().describe('Total output size in bytes when persisted'),
-  backgroundTaskId: z.string().optional().describe('ID of the background task if command is running in background'),
+  backgroundTaskId: z.string().optional().describe('ID of the background agent if command is running in background'),
   backgroundedByUser: z.boolean().optional().describe('True if the user manually backgrounded the command with Ctrl+B'),
   assistantAutoBackgrounded: z.boolean().optional().describe('True if the command was auto-backgrounded by the assistant-mode blocking budget')
 }));
@@ -455,7 +455,7 @@ export const PowerShellTool = buildTool({
       const commandGenerator = runPowerShellCommand({
         input,
         abortController,
-        // Use the always-shared task channel so async agents' background
+        // Use the always-shared agent channel so async agents' background
         // shell tasks are actually registered (and killable on agent exit).
         setAppState: toolUseContext.setAppStateForTasks ?? setAppState,
         setToolJSX,
@@ -524,7 +524,7 @@ export const PowerShellTool = buildTool({
         }
       }
 
-      // If backgrounded, return immediately with task ID. Strip hints first
+      // If backgrounded, return immediately with agent ID. Strip hints first
       // so interrupt-backgrounded fullOutput doesn't leak the tag to the
       // model (BashTool has no early return, so all paths flow through its
       // single extraction site).
@@ -762,7 +762,7 @@ async function* runPowerShellCommand({
   }
   const resultPromise = shellCommand.result;
 
-  // Helper to spawn a background task and return its ID
+  // Helper to spawn a background agent and return its ID
   async function spawnBackgroundTask(): Promise<string> {
     const handle = await spawnShellTask({
       command,
@@ -782,7 +782,7 @@ async function* runPowerShellCommand({
 
   // Helper to start backgrounding with logging
   function startBackgrounding(eventName: string, backgroundFn?: (shellId: string) => void): void {
-    // If a foreground task is already registered (via registerForeground in the
+    // If a foreground agent is already registered (via registerForeground in the
     // progress loop), background it in-place instead of re-spawning. Re-spawning
     // would overwrite tasks[taskId], emit a duplicate task_started SDK event,
     // and leak the first cleanup callback.
@@ -798,7 +798,7 @@ async function* runPowerShellCommand({
       return;
     }
 
-    // No foreground task registered — spawn a new background task
+    // No foreground agent registered — spawn a new background agent
     // Note: spawn is essentially synchronous despite being async
     void spawnBackgroundTask().then(shellId => {
       backgroundShellId = shellId;
@@ -936,7 +936,7 @@ async function* runPowerShellCommand({
         shellCommand.kill();
       }
 
-      // Check if this foreground task was backgrounded via backgroundAll() (ctrl+b)
+      // Check if this foreground agent was backgrounded via backgroundAll() (ctrl+b)
       if (foregroundTaskId) {
         if (shellCommand.status === 'backgrounded') {
           return {

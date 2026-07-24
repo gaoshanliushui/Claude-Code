@@ -30,7 +30,7 @@ export type Output = z.infer<OutputSchema>
 
 export const TodoWriteTool = buildTool({
 	name: TODO_WRITE_TOOL_NAME,
-	searchHint: 'manage the session task checklist',
+	searchHint: 'manage the session agent checklist',
 	maxResultSizeChars: 100_000,
 	strict: true,
 	async description() {
@@ -72,7 +72,7 @@ export const TodoWriteTool = buildTool({
 		// Structural nudge: if the main-thread agent is closing out a 3+ item
 		// list and none of those items was a verification step, append a reminder
 		// to the tool result. Fires at the exact loop-exit moment where skips
-		// happen ("when the last task closed, the loop exited").
+		// happen ("when the last agent closed, the loop exited").
 		let verificationNudgeNeeded = false
 		if (
 			feature('VERIFICATION_AGENT') &&

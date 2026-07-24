@@ -784,7 +784,7 @@ export function selectableUserMessagesFilter(message: Message): message is UserM
   const lastBlock = typeof content === 'string' ? null : content[content.length - 1];
   const messageText = typeof content === 'string' ? content.trim() : lastBlock && isTextBlock(lastBlock) ? lastBlock.text.trim() : '';
 
-  // Filter out non-user-authored messages (command outputs, task notifications, ticks).
+  // Filter out non-user-authored messages (command outputs, agent notifications, ticks).
   if (messageText.indexOf(`<${LOCAL_COMMAND_STDOUT_TAG}>`) !== -1 || messageText.indexOf(`<${LOCAL_COMMAND_STDERR_TAG}>`) !== -1 || messageText.indexOf(`<${BASH_STDOUT_TAG}>`) !== -1 || messageText.indexOf(`<${BASH_STDERR_TAG}>`) !== -1 || messageText.indexOf(`<${TASK_NOTIFICATION_TAG}>`) !== -1 || messageText.indexOf(`<${TICK_TAG}>`) !== -1 || messageText.indexOf(`<${TEAMMATE_MESSAGE_TAG}`) !== -1) {
     return false;
   }

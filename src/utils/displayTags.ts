@@ -2,7 +2,7 @@
  * Matches any XML-like `<tag>…</tag>` block (lowercase tag names, optional
  * attributes, multi-line content). Used to strip system-injected wrapper tags
  * from display titles — IDE context, slash-command markers, hook output,
- * task notifications, channel messages, etc. A generic pattern avoids
+ * agent notifications, channel messages, etc. A generic pattern avoids
  * maintaining an ever-growing allowlist that falls behind as new notification
  * types are added.
  *
@@ -17,7 +17,7 @@ const XML_TAG_BLOCK_PATTERN = /<([a-z][\w-]*)(?:\s[^>]*)?>[\s\S]*?<\/\1>\n?/g
 /**
  * Strip XML-like tag blocks from text for use in UI titles (/rewind, /resume,
  * bridge session titles). System-injected context — IDE metadata, hook output,
- * task notifications — arrives wrapped in tags and should never surface as a
+ * agent notifications — arrives wrapped in tags and should never surface as a
  * title.
  *
  * If stripping would result in empty text, returns the original unchanged

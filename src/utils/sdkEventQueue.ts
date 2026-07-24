@@ -37,7 +37,7 @@ type TaskProgressEvent = {
 // Drained by drainSdkEvents() directly into the output stream — does NOT
 // go through the print.ts XML task_notification parser and does NOT trigger
 // the LLM loop. Consumers (e.g. VS Code session.ts) use this to remove the
-// task from the subagent panel.
+// agent from the subagent panel.
 type TaskNotificationSdkEvent = {
   type: 'system'
   subtype: 'task_notification'
@@ -101,15 +101,15 @@ export function drainSdkEvents(): Array<
 }
 
 /**
- * Emit a task_notification SDK event for a task reaching a terminal state.
+ * Emit a task_notification SDK event for a agent reaching a terminal state.
  *
  * registerTask() always emits task_started; this is the closing bookend.
- * Call this from any exit path that sets a task terminal WITHOUT going
- * through enqueuePendingNotification-with-<task-id> (print.ts parses that
+ * Call this from any exit path that sets a agent terminal WITHOUT going
+ * through enqueuePendingNotification-with-<agent-id> (print.ts parses that
  * XML into the same SDK event, so paths that do both would double-emit).
  * Paths that suppress the XML notification (notified:true pre-set, kill
  * paths, abort branches) must call this directly so SDK consumers
- * (Scuttle's bg-task dot, VS Code subagent panel) see the task close.
+ * (Scuttle's bg-agent dot, VS Code subagent panel) see the agent close.
  */
 export function emitTaskTerminatedSdk(
   taskId: string,

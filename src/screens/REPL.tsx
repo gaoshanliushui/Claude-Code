@@ -731,7 +731,7 @@ export type Props = {
 	mainThreadAgentDefinition?: AgentDefinition;
 	// When true, disables all slash commands
 	disableSlashCommands?: boolean;
-	// Task list id: when set, enables tasks mode that watches a task list and auto-processes tasks.
+	// Task list id: when set, enables tasks mode that watches a agent list and auto-processes tasks.
 	taskListId?: string;
 	// Remote session config for --remote mode (uses CCR as execution engine)
 	remoteSessionConfig?: RemoteSessionConfig;
@@ -1690,7 +1690,7 @@ export function REPL({
 	// When ultraplan approval fires while the pill dialog is open, PromptInput
 	// unmounts (focusedInputDialog → 'ultraplan-choice') but this stays true;
 	// after accepting, PromptInput remounts into an empty "No tasks" dialog
-	// (the completed ultraplan task has been filtered out). Close it here.
+	// (the completed ultraplan agent has been filtered out). Close it here.
 	useEffect(() => {
 		if (ultraplanPendingChoice && showBashesDialog) {
 			setShowBashesDialog(false);
@@ -1856,9 +1856,9 @@ export function REPL({
 	});
 	const showSpinner = (!toolJSX || toolJSX.showSpinner === true) && toolUseConfirmQueue.length === 0 && promptQueue.length === 0 && (
 			// Show spinner during input processing, API call, while teammates are running,
-			// or while pending task notifications are queued (prevents spinner bounce between consecutive notifications)
+			// or while pending agent notifications are queued (prevents spinner bounce between consecutive notifications)
 			isLoading || userInputOnProcessing || hasRunningTeammates ||
-			// Keep spinner visible while task notifications are queued for processing.
+			// Keep spinner visible while agent notifications are queued for processing.
 			// Without this, the spinner briefly disappears between consecutive notifications
 			// (e.g., multiple background agents completing in rapid succession) because
 			// isLoading goes false momentarily between processing each one.
@@ -2714,8 +2714,8 @@ export function REPL({
 	const handleBackgroundQuery = useCallback(() => {
 		// Stop the foreground query so the background one takes over
 		abortController?.abort('background');
-		// Aborting subagents may produce task-completed notifications.
-		// Clear task notifications so the queue processor doesn't immediately
+		// Aborting subagents may produce agent-completed notifications.
+		// Clear agent notifications so the queue processor doesn't immediately
 		// start a new foreground query; forward them to the background session.
 		const removedNotifications = removeByFilter(cmd => cmd.mode === 'task-notification');
 		void (async () => {
@@ -2735,11 +2735,11 @@ export function REPL({
 			// Deduplicate: if the query loop already yielded a notification into
 			// messagesRef before we removed it from the queue, skip duplicates.
 			// We use prompt text for dedup because source_uuid is not set on
-			// task-notification QueuedCommands (enqueuePendingNotification callers
+			// agent-notification QueuedCommands (enqueuePendingNotification callers
 			// don't pass uuid), so it would always be undefined.
 			const existingPrompts = new Set<string>();
 			for (const m of messagesRef.current) {
-				if (m.type === 'attachment' && m.attachment.type === 'queued_command' && m.attachment.commandMode === 'task-notification' && typeof m.attachment.prompt === 'string') {
+				if (m.type === 'attachment' && m.attachment.type === 'queued_command' && m.attachment.commandMode === 'agent-notification' && typeof m.attachment.prompt === 'string') {
 					existingPrompts.add(m.attachment.prompt);
 				}
 			}
@@ -4215,7 +4215,7 @@ export function REPL({
 		if (queryGuard.isActive) return false;
 
 		// Defer to user-queued commands — user input always takes priority
-		// over system messages (teammate messages, task list items, etc.)
+		// over system messages (teammate messages, agent list items, etc.)
 		// Read from the module-level store at call time (not the render-time
 		// snapshot) to avoid a stale closure — this callback's deps don't
 		// include the queue.
@@ -4599,7 +4599,7 @@ export function REPL({
 	const transcriptMessages = frozenTranscriptState ? deferredMessages.slice(0, frozenTranscriptState.messagesLength) : deferredMessages;
 	const transcriptStreamingToolUses = frozenTranscriptState ? streamingToolUses.slice(0, frozenTranscriptState.streamingToolUsesLength) : streamingToolUses;
 
-	// Handle shift+down for teammate navigation and background task management.
+	// Handle shift+down for teammate navigation and background agent management.
 	// Guard onOpenBackgroundTasks when a local-jsx dialog (e.g. /mcp) is open —
 	// otherwise Shift+Down stacks BackgroundTasksDialog on top and deadlocks input.
 	useBackgroundTaskNavigation({
@@ -4644,7 +4644,7 @@ export function REPL({
 			<CommandKeybindingHandlers onSubmit={onSubmit} isActive={!toolJSX?.isLocalJSXCommand}/>
 			{transcriptScrollRef ?
 				// ScrollKeybindingHandler must mount before CancelRequestHandler so
-				// ctrl+c-with-selection copies instead of cancelling the active task.
+				// ctrl+c-with-selection copies instead of cancelling the active agent.
 				// Its raw useInput handler only stops propagation when a selection
 				// exists — without one, ctrl+c falls through to CancelRequestHandler.
 				<ScrollKeybindingHandler scrollRef={scrollRef}
@@ -4727,7 +4727,7 @@ export function REPL({
 		return transcriptReturn;
 	}
 
-	// Get viewed agent task (inlined from selectors for explicit data flow).
+	// Get viewed agent agent (inlined from selectors for explicit data flow).
 	// viewedAgentTask: teammate OR local_agent — drives the boolean checks
 	// below. viewedTeammateTask: teammate-only narrowed, for teammate-specific
 	// field access (inProgressToolUseIDs).
@@ -4798,7 +4798,7 @@ export function REPL({
 			                        resetAnchor={voice.resetAnchor} isActive={!toolJSX?.isLocalJSXCommand}/> : null}
 		<CommandKeybindingHandlers onSubmit={onSubmit} isActive={!toolJSX?.isLocalJSXCommand}/>
 		{/* ScrollKeybindingHandler must mount before CancelRequestHandler so
-          ctrl+c-with-selection copies instead of cancelling the active task.
+          ctrl+c-with-selection copies instead of cancelling the active agent.
           Its raw useInput handler only stops propagation when a selection
           exists — without one, ctrl+c falls through to CancelRequestHandler.
           PgUp/PgDn/wheel always scroll the transcript behind the modal —

@@ -15,7 +15,7 @@ export function getMaxTaskOutputLength(): number {
 }
 
 /**
- * Format task output for API consumption, truncating if too large.
+ * Format agent output for API consumption, truncating if too large.
  * When truncated, includes a header with the file path and returns
  * the last N characters that fit within the limit.
  */

@@ -14,7 +14,7 @@ import {jsonParse, jsonStringify} from './slowOperations.js'
 import {getTeamName} from './teammate.js'
 import {getTeammateContext} from './teammateContext.js'
 
-// Listeners for task list updates (used for immediate UI refresh in same process)
+// Listeners for agent list updates (used for immediate UI refresh in same process)
 const tasksUpdated = createSignal()
 
 /**
@@ -25,13 +25,13 @@ const tasksUpdated = createSignal()
 let leaderTeamName: string | undefined
 
 /**
- * Sets the leader's team name for task list resolution.
+ * Sets the leader's team name for agent list resolution.
  * Called by TeamCreateTool when a team is created.
  */
 export function setLeaderTeamName(teamName: string): void {
 	if (leaderTeamName === teamName) return
 	leaderTeamName = teamName
-	// Changing the task list ID is a "tasks updated" event for subscribers —
+	// Changing the agent list ID is a "tasks updated" event for subscribers —
 	// they're now looking at a different directory.
 	notifyTasksUpdated()
 }
@@ -56,13 +56,13 @@ export const onTasksUpdated = tasksUpdated.subscribe
  * Notify listeners that tasks have been updated.
  * Called internally after createTask, updateTask, etc.
  * Wraps emit in try/catch so listener failures never propagate to callers
- * (task mutations must succeed from the caller's perspective).
+ * (agent mutations must succeed from the caller's perspective).
  */
 export function notifyTasksUpdated(): void {
 	try {
 		tasksUpdated.emit()
 	} catch {
-		// Ignore listener errors — task mutations must not fail due to notification issues
+		// Ignore listener errors — agent mutations must not fail due to notification issues
 	}
 }
 
@@ -81,14 +81,14 @@ export const TaskSchema = lazySchema(() =>
 		activeForm: z.string().optional(), // present continuous form for spinner (e.g., "Running tests")
 		owner: z.string().optional(), // agent ID
 		status: TaskStatusSchema(),
-		blocks: z.array(z.string()), // task IDs this task blocks
-		blockedBy: z.array(z.string()), // task IDs that block this task
+		blocks: z.array(z.string()), // agent IDs this agent blocks
+		blockedBy: z.array(z.string()), // agent IDs that block this agent
 		metadata: z.record(z.string(), z.unknown()).optional(), // arbitrary metadata
 	}),
 )
 export type Task = z.infer<ReturnType<typeof TaskSchema>>
 
-// High water mark file name - stores the maximum task ID ever assigned
+// High water mark file name - stores the maximum agent ID ever assigned
 const HIGH_WATER_MARK_FILE = '.highwatermark'
 
 // Lock options: retry with backoff so concurrent callers (multiple Claudes
@@ -139,9 +139,9 @@ export function isTodoV2Enabled(): boolean {
 }
 
 /**
- * Resets the task list for a new swarm - clears any existing tasks.
+ * Resets the agent list for a new swarm - clears any existing tasks.
  * Writes a high water mark file to prevent ID reuse after reset.
- * Should be called when a new swarm is created to ensure task numbering starts at 1.
+ * Should be called when a new swarm is created to ensure agent numbering starts at 1.
  * Uses file locking to prevent race conditions when multiple Claudes run in parallel.
  */
 export async function resetTaskList(taskListId: string): Promise<void> {
@@ -150,7 +150,7 @@ export async function resetTaskList(taskListId: string): Promise<void> {
 
 	let release: (() => Promise<void>) | undefined
 	try {
-		// Acquire exclusive lock on the task list
+		// Acquire exclusive lock on the agent list
 		release = await lockfile.lock(lockPath, LOCK_OPTIONS)
 
 		// Find the current highest ID and save it to the high water mark file
@@ -162,7 +162,7 @@ export async function resetTaskList(taskListId: string): Promise<void> {
 			}
 		}
 
-		// Delete all task files
+		// Delete all agent files
 		let files: string[]
 		try {
 			files = await readdir(dir)
@@ -188,10 +188,10 @@ export async function resetTaskList(taskListId: string): Promise<void> {
 }
 
 /**
- * Gets the task list ID based on the current context.
+ * Gets the agent list ID based on the current context.
  * Priority:
- * 1. CLAUDE_CODE_TASK_LIST_ID - explicit task list ID
- * 2. In-process teammate: leader's team name (so teammates share the leader's task list)
+ * 1. CLAUDE_CODE_TASK_LIST_ID - explicit agent list ID
+ * 2. In-process teammate: leader's team name (so teammates share the leader's agent list)
  * 3. CLAUDE_CODE_TEAM_NAME - set when running as a process-based teammate
  * 4. Leader team name - set when the leader creates a team via TeamCreate
  * 5. Session ID - fallback for standalone sessions
@@ -201,7 +201,7 @@ export function getTaskListId(): string {
 		return process.env.CLAUDE_CODE_TASK_LIST_ID
 	}
 	// In-process teammates use the leader's team name so they share the same
-	// task list that tmux/iTerm2 teammates also resolve to.
+	// agent list that tmux/iTerm2 teammates also resolve to.
 	const teammateCtx = getTeammateContext()
 	if (teammateCtx) {
 		return teammateCtx.teamName
@@ -241,7 +241,7 @@ export async function ensureTasksDir(taskListId: string): Promise<void> {
 }
 
 /**
- * Finds the highest task ID from existing task files (not including high water mark).
+ * Finds the highest agent ID from existing agent files (not including high water mark).
  */
 async function findHighestTaskIdFromFiles(taskListId: string): Promise<number> {
 	const dir = getTasksDir(taskListId)
@@ -265,7 +265,7 @@ async function findHighestTaskIdFromFiles(taskListId: string): Promise<number> {
 }
 
 /**
- * Finds the highest task ID ever assigned, considering both existing files
+ * Finds the highest agent ID ever assigned, considering both existing files
  * and the high water mark (for deleted/reset tasks).
  */
 async function findHighestTaskId(taskListId: string): Promise<number> {
@@ -277,7 +277,7 @@ async function findHighestTaskId(taskListId: string): Promise<number> {
 }
 
 /**
- * Creates a new task with a unique ID.
+ * Creates a new agent with a unique ID.
  * Uses file locking to prevent race conditions when multiple processes
  * create tasks concurrently.
  */
@@ -289,7 +289,7 @@ export async function createTask(
 
 	let release: (() => Promise<void>) | undefined
 	try {
-		// Acquire exclusive lock on the task list
+		// Acquire exclusive lock on the agent list
 		release = await lockfile.lock(lockPath, LOCK_OPTIONS)
 
 		// Read highest ID from disk while holding the lock
@@ -320,7 +320,7 @@ export async function getTask(
 		if (process.env.USER_TYPE === 'ant') {
 			if (data.status === 'open') data.status = 'pending'
 			else if (data.status === 'resolved') data.status = 'completed'
-			// Migrate development task statuses to in_progress
+			// Migrate development agent statuses to in_progress
 			else if (
 				data.status &&
 				['planning', 'implementing', 'reviewing', 'verifying'].includes(
@@ -406,7 +406,7 @@ export async function deleteTask(
 			}
 		}
 
-		// Delete the task file
+		// Delete the agent file
 		try {
 			await unlink(path)
 		} catch (e) {
@@ -417,7 +417,7 @@ export async function deleteTask(
 			throw e
 		}
 
-		// Remove references to this task from other tasks
+		// Remove references to this agent from other tasks
 		const allTasks = await listTasks(taskListId)
 		for (const task of allTasks) {
 			const newBlocks = task.blocks.filter(id => id !== taskId)
@@ -468,14 +468,14 @@ export async function blockTask(
 		return false
 	}
 
-	// Update source task: A blocks B
+	// Update source agent: A blocks B
 	if (!fromTask.blocks.includes(toTaskId)) {
 		await updateTask(taskListId, fromTaskId, {
 			blocks: [...fromTask.blocks, toTaskId],
 		})
 	}
 
-	// Update target task: B is blockedBy A
+	// Update target agent: B is blockedBy A
 	if (!toTask.blockedBy.includes(fromTaskId)) {
 		await updateTask(taskListId, toTaskId, {
 			blockedBy: [...toTask.blockedBy, fromTaskId],
@@ -494,19 +494,19 @@ export type ClaimTaskResult = {
 		| 'blocked'
 		| 'agent_busy'
 	task?: Task
-	busyWithTasks?: string[] // task IDs the agent is busy with (when reason is 'agent_busy')
-	blockedByTasks?: string[] // task IDs blocking this task (when reason is 'blocked')
+	busyWithTasks?: string[] // agent IDs the agent is busy with (when reason is 'agent_busy')
+	blockedByTasks?: string[] // agent IDs blocking this agent (when reason is 'blocked')
 }
 
 /**
- * Gets the lock file path for a task list (used for list-level locking)
+ * Gets the lock file path for a agent list (used for list-level locking)
  */
 function getTaskListLockPath(taskListId: string): string {
 	return join(getTasksDir(taskListId), '.lock')
 }
 
 /**
- * Ensures the lock file exists for a task list
+ * Ensures the lock file exists for a agent list
  */
 async function ensureTaskListLockFile(taskListId: string): Promise<string> {
 	await ensureTasksDir(taskListId)
@@ -526,16 +526,16 @@ export type ClaimTaskOptions = {
 	/**
 	 * If true, checks whether the agent is already busy (owns other open tasks)
 	 * before allowing the claim. This check is performed atomically with the claim
-	 * using a task-list-level lock to prevent TOCTOU race conditions.
+	 * using a agent-list-level lock to prevent TOCTOU race conditions.
 	 */
 	checkAgentBusy?: boolean
 }
 
 /**
- * Attempts to claim a task for an agent with file locking to prevent race conditions.
- * Returns success if the task was claimed, or a reason if it wasn't.
+ * Attempts to claim a agent for an agent with file locking to prevent race conditions.
+ * Returns success if the agent was claimed, or a reason if it wasn't.
  *
- * When checkAgentBusy is true, uses a task-list-level lock to atomically check
+ * When checkAgentBusy is true, uses a agent-list-level lock to atomically check
  * if the agent owns any other open tasks before claiming.
  */
 export async function claimTask(
@@ -553,19 +553,19 @@ export async function claimTask(
 		return {success: false, reason: 'task_not_found'}
 	}
 
-	// If we need to check agent busy status, use task-list-level lock
+	// If we need to check agent busy status, use agent-list-level lock
 	// to prevent TOCTOU race conditions
 	if (options.checkAgentBusy) {
 		return claimTaskWithBusyCheck(taskListId, taskId, claimantAgentId)
 	}
 
-	// Otherwise, use task-level lock (original behavior)
+	// Otherwise, use agent-level lock (original behavior)
 	let release: (() => Promise<void>) | undefined
 	try {
-		// Acquire exclusive lock on the task file
+		// Acquire exclusive lock on the agent file
 		release = await lockfile.lock(taskPath, LOCK_OPTIONS)
 
-		// Read current task state
+		// Read current agent state
 		const task = await getTask(taskListId, taskId)
 		if (!task) {
 			return {success: false, reason: 'task_not_found'}
@@ -593,7 +593,7 @@ export async function claimTask(
 			return {success: false, reason: 'blocked', task, blockedByTasks}
 		}
 
-		// Claim the task (already holding taskPath lock — use unsafe variant)
+		// Claim the agent (already holding taskPath lock — use unsafe variant)
 		const updated = await updateTaskUnsafe(taskListId, taskId, {
 			owner: claimantAgentId,
 		})
@@ -612,8 +612,8 @@ export async function claimTask(
 }
 
 /**
- * Claims a task with an atomic check for agent busy status.
- * Uses a task-list-level lock to ensure the busy check and claim are atomic.
+ * Claims a agent with an atomic check for agent busy status.
+ * Uses a agent-list-level lock to ensure the busy check and claim are atomic.
  */
 async function claimTaskWithBusyCheck(
 	taskListId: string,
@@ -624,13 +624,13 @@ async function claimTaskWithBusyCheck(
 
 	let release: (() => Promise<void>) | undefined
 	try {
-		// Acquire exclusive lock on the task list
+		// Acquire exclusive lock on the agent list
 		release = await lockfile.lock(lockPath, LOCK_OPTIONS)
 
-		// Read all tasks to check agent status and task state atomically
+		// Read all tasks to check agent status and agent state atomically
 		const allTasks = await listTasks(taskListId)
 
-		// Find the task we want to claim
+		// Find the agent we want to claim
 		const task = allTasks.find(t => t.id === taskId)
 		if (!task) {
 			return {success: false, reason: 'task_not_found'}
@@ -673,7 +673,7 @@ async function claimTaskWithBusyCheck(
 			}
 		}
 
-		// Claim the task
+		// Claim the agent
 		const updated = await updateTask(taskListId, taskId, {
 			owner: claimantAgentId,
 		})
@@ -701,14 +701,14 @@ export type TeamMember = {
 }
 
 /**
- * Agent status based on task ownership
+ * Agent status based on agent ownership
  */
 export type AgentStatus = {
 	agentId: string
 	name: string
 	agentType?: string
 	status: 'idle' | 'busy'
-	currentTasks: string[] // task IDs the agent owns
+	currentTasks: string[] // agent IDs the agent owns
 }
 
 /**
@@ -753,9 +753,9 @@ async function readTeamMembers(
 }
 
 /**
- * Gets the status of all agents in a team based on task ownership.
+ * Gets the status of all agents in a team based on agent ownership.
  * An agent is considered "idle" if they don't own any open tasks.
- * An agent is considered "busy" if they own at least one open task.
+ * An agent is considered "busy" if they own at least one open agent.
  *
  * @param teamName - The name of the team (also used as taskListId)
  * @returns Array of agent statuses, or null if team not found
@@ -809,7 +809,7 @@ export type UnassignTasksResult = {
  * Unassigns all open tasks from a teammate and builds a notification message.
  * Used when a teammate is killed or gracefully shuts down.
  *
- * @param teamName - The team/task list name
+ * @param teamName - The team/agent list name
  * @param teammateId - The teammate's agent ID
  * @param teammateName - The teammate's display name
  * @param reason - How the teammate exited ('terminated' | 'shutdown')
@@ -828,7 +828,7 @@ export async function unassignTeammateTasks(
 			(t.owner === teammateId || t.owner === teammateName),
 	)
 
-	// Unassign each task and reset status to open
+	// Unassign each agent and reset status to open
 	for (const task of unresolvedAssignedTasks) {
 		await updateTask(teamName, task.id, {owner: undefined, status: 'pending'})
 	}

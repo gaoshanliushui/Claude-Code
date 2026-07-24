@@ -20,7 +20,7 @@ type Props = {
    *  is no text input competing for those characters — i.e. transcript
    *  mode. Defaults to false. When true, G works regardless of editorMode
    *  and sticky state; ctrl+u/d/b/f don't conflict with kill-line/exit/
-   *  task:background/kill-agents (none are mounted, or they mount after
+   *  agent:background/kill-agents (none are mounted, or they mount after
    *  this component so stopImmediatePropagation wins). */
   isModal?: boolean;
 };
@@ -513,7 +513,7 @@ export function ScrollKeybindingHandler({
   });
 
   // scroll:halfPage*/fullPage* have no default key bindings — ctrl+u/d/b/f
-  // all have real owners in normal mode (kill-line/exit/task:background/
+  // all have real owners in normal mode (kill-line/exit/agent:background/
   // kill-agents). Transcript mode gets them via the isModal raw useInput
   // below. These handlers stay for custom rebinds only.
   useKeybindings({
@@ -561,7 +561,7 @@ export function ScrollKeybindingHandler({
   //
   // Safe because the conflicting handlers aren't reachable here:
   //   ctrl+u → kill-line, ctrl+d → exit: PromptInput not mounted
-  //   ctrl+b → task:background: SessionBackgroundHint not mounted
+  //   ctrl+b → agent:background: SessionBackgroundHint not mounted
   //   ctrl+f → chat:killAgents moved to ctrl+x ctrl+k; no conflict
   //   g/G → printable chars: no prompt to eat them, no vim/sticky gate needed
   //

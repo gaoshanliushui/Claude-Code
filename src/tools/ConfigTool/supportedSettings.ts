@@ -85,7 +85,7 @@ export const SUPPORTED_SETTINGS: Record<string, SettingConfig> = {
   todoFeatureEnabled: {
     source: 'global',
     type: 'boolean',
-    description: 'Enable todo/task tracking',
+    description: 'Enable todo/agent tracking',
   },
   model: {
     source: 'settings',

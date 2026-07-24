@@ -203,7 +203,7 @@ export function useRemoteSession({
         }
 
         // Track remote subagent lifecycle for the "N in background" counter.
-        // All task types (Agent/teammate/workflow/bash) flow through
+        // All agent types (Agent/teammate/workflow/bash) flow through
         // registerTask() → task_started, and complete via task_notification.
         // Return early — these are status signals, not renderable messages.
         if (sdkMessage.type === 'system') {
@@ -503,7 +503,7 @@ export function useRemoteSession({
       }
 
       // Update the session title after the first message when no initial prompt was provided.
-      // This gives the session a meaningful title on claude.ai instead of "Background task".
+      // This gives the session a meaningful title on claude.ai instead of "Background agent".
       // Skip in viewerOnly mode — the remote agent owns the session title.
       if (
         !hasUpdatedTitleRef.current &&

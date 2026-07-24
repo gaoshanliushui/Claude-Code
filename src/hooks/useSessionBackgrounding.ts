@@ -2,9 +2,9 @@
  * Hook for managing session backgrounding (Ctrl+B to background/foreground sessions).
  *
  * Handles:
- * - Calling onBackgroundQuery to spawn a background task for the current query
+ * - Calling onBackgroundQuery to spawn a background agent for the current query
  * - Re-backgrounding foregrounded tasks
- * - Syncing foregrounded task messages/state to main view
+ * - Syncing foregrounded agent messages/state to main view
  */
 
 import { useCallback, useEffect, useRef } from 'react'
@@ -40,7 +40,7 @@ export function useSessionBackgrounding({
 
   const handleBackgroundSession = useCallback(() => {
     if (foregroundedTaskId) {
-      // Re-background the foregrounded task
+      // Re-background the foregrounded agent
       setAppState(prev => {
         const taskId = prev.foregroundedTaskId
         if (!taskId) return prev
@@ -73,10 +73,10 @@ export function useSessionBackgrounding({
     onBackgroundQuery,
   ])
 
-  // Sync foregrounded task's messages and loading state to the main view
+  // Sync foregrounded agent's messages and loading state to the main view
   useEffect(() => {
     if (!foregroundedTaskId) {
-      // Reset when no foregrounded task
+      // Reset when no foregrounded agent
       lastSyncedMessagesLengthRef.current = 0
       return
     }
@@ -88,7 +88,7 @@ export function useSessionBackgrounding({
       return
     }
 
-    // Sync messages from background task to main view
+    // Sync messages from background agent to main view
     // Only update if messages have actually changed to avoid redundant renders
     const taskMessages = foregroundedTask.messages ?? []
     if (taskMessages.length !== lastSyncedMessagesLengthRef.current) {
@@ -97,7 +97,7 @@ export function useSessionBackgrounding({
     }
 
     if (foregroundedTask.status === 'running') {
-      // Check if the task was aborted (user pressed Escape)
+      // Check if the agent was aborted (user pressed Escape)
       const taskAbortController = foregroundedTask.abortController
       if (taskAbortController?.signal.aborted) {
         // Task was aborted - clear foregrounded state immediately
@@ -121,7 +121,7 @@ export function useSessionBackgrounding({
       }
 
       setIsLoading(true)
-      // Set abort controller to the foregrounded task's controller for Escape handling
+      // Set abort controller to the foregrounded agent's controller for Escape handling
       if (taskAbortController) {
         setAbortController(taskAbortController)
       }

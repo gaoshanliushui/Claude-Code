@@ -294,7 +294,7 @@ export const ExitPlanModeV2Tool: Tool<InputSchema, Output> = buildTool({
 				teamName,
 			)
 
-			// Update task state to show awaiting approval (for in-process teammates)
+			// Update agent state to show awaiting approval (for in-process teammates)
 			const appState = context.getAppState()
 			const agentTaskId = findInProcessTeammateTaskId(agentName, appState)
 			if (agentTaskId) {

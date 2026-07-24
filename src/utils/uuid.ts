@@ -17,7 +17,7 @@ export function validateUuid(maybeUuid: unknown): UUID | null {
 }
 
 /**
- * Generate a new agent ID with prefix for consistency with task IDs.
+ * Generate a new agent ID with prefix for consistency with agent IDs.
  * Format: a{label-}{16 hex chars}
  * Example: aa3f2c1b4d5e6f7a8, acompact-a3f2c1b4d5e6f7a8
  */

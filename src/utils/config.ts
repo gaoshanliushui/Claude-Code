@@ -240,7 +240,7 @@ export type GlobalConfig = {
 	env: { [key: string]: string } // Environment variables to set for the CLI
 	hasSeenTasksHint?: boolean // Whether the user has seen the tasks hint
 	hasUsedStash?: boolean // Whether the user has used the stash feature (Ctrl+S)
-	hasUsedBackgroundTask?: boolean // Whether the user has backgrounded a task (Ctrl+B)
+	hasUsedBackgroundTask?: boolean // Whether the user has backgrounded a agent (Ctrl+B)
 	queuedCommandUpHintCount?: number // Counter for how many times the user has seen the queued command up hint
 	diffTool?: DiffTool // Which tool to use for displaying diffs (terminal or vscode)
 

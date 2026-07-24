@@ -205,7 +205,7 @@ function executeInBackground({
 }): boolean {
 	if (asyncRewake) {
 		// asyncRewake hooks bypass the registry entirely. On completion, if exit
-		// code 2 (blocking error), enqueue as a task-notification so it wakes the
+		// code 2 (blocking error), enqueue as a agent-notification so it wakes the
 		// model via useQueueProcessor (idle) or gets injected mid-query via
 		// queued_command attachments (busy).
 		//
@@ -3832,12 +3832,12 @@ export async function* executeTeammateIdleHooks(
 }
 
 /**
- * Execute TaskCreated hooks when a task is being created.
- * If a hook blocks (exit code 2), the task creation should be prevented and feedback returned.
- * @param taskId The ID of the task being created
- * @param taskSubject The subject/title of the task
- * @param taskDescription Optional description of the task
- * @param teammateName Optional name of the teammate creating the task
+ * Execute TaskCreated hooks when a agent is being created.
+ * If a hook blocks (exit code 2), the agent creation should be prevented and feedback returned.
+ * @param taskId The ID of the agent being created
+ * @param taskSubject The subject/title of the agent
+ * @param taskDescription Optional description of the agent
+ * @param teammateName Optional name of the teammate creating the agent
  * @param teamName Optional team name
  * @param permissionMode Optional permission mode
  * @param signal Optional AbortSignal to cancel hook execution
@@ -3876,12 +3876,12 @@ export async function* executeTaskCreatedHooks(
 }
 
 /**
- * Execute TaskCompleted hooks when a task is being marked as completed.
- * If a hook blocks (exit code 2), the task completion should be prevented and feedback returned.
- * @param taskId The ID of the task being completed
- * @param taskSubject The subject/title of the task
- * @param taskDescription Optional description of the task
- * @param teammateName Optional name of the teammate completing the task
+ * Execute TaskCompleted hooks when a agent is being marked as completed.
+ * If a hook blocks (exit code 2), the agent completion should be prevented and feedback returned.
+ * @param taskId The ID of the agent being completed
+ * @param taskSubject The subject/title of the agent
+ * @param taskDescription Optional description of the agent
+ * @param teammateName Optional name of the teammate completing the agent
  * @param teamName Optional team name
  * @param permissionMode Optional permission mode
  * @param signal Optional AbortSignal to cancel hook execution

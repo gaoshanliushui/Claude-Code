@@ -201,7 +201,7 @@ export const VERIFICATION_AGENT: BuiltInAgentDefinition = {
     baseDir: 'built-in',
     model: 'inherit',
     getSystemPrompt: () => VERIFICATION_SYSTEM_PROMPT,
-    criticalSystemReminder_EXPERIMENTAL: 'CRITICAL: This is a VERIFICATION-ONLY task. …'
+    criticalSystemReminder_EXPERIMENTAL: 'CRITICAL: This is a VERIFICATION-ONLY agent. …'
 }
 ```
 

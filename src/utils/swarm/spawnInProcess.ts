@@ -1,7 +1,7 @@
 /**
  * In-process teammate spawning
  *
- * Creates and registers an in-process teammate task. Unlike process-based
+ * Creates and registers an in-process teammate agent. Unlike process-based
  * teammates (tmux/iTerm2), in-process teammates run in the same Node.js
  * process using AsyncLocalStorage for context isolation.
  *
@@ -61,7 +61,7 @@ export type InProcessSpawnConfig = {
 	name: string
 	/** Team this teammate belongs to */
 	teamName: string
-	/** Initial prompt/task for the teammate */
+	/** Initial prompt/agent for the teammate */
 	prompt: string
 	/** Optional UI color for the teammate */
 	color?: string
@@ -92,13 +92,13 @@ export type InProcessSpawnOutput = {
 /**
  * Spawns an in-process teammate.
  *
- * Creates the teammate's context, registers the task in AppState, and returns
+ * Creates the teammate's context, registers the agent in AppState, and returns
  * the spawn result. The actual agent execution is driven by the
  * InProcessTeammateTask component which uses runWithTeammateContext() to
  * execute the agent loop with proper identity isolation.
  *
  * @param config - Spawn configuration
- * @param context - Context with setAppState for registering task
+ * @param context - Context with setAppState for registering agent
  * @returns Spawn result with teammate info
  */
 export async function spawnInProcessTeammate(
@@ -151,7 +151,7 @@ export async function spawnInProcessTeammate(
 			registerPerfettoAgent(agentId, name, parentSessionId)
 		}
 
-		// Create task state
+		// Create agent state
 		const description = `${name}: ${prompt.substring(0, 50)}${prompt.length > 50 ? '...' : ''}`
 
 		const taskState: InProcessTeammateTaskState = {
@@ -187,7 +187,7 @@ export async function spawnInProcessTeammate(
 		})
 		taskState.unregisterCleanup = unregisterCleanup
 
-		// Register task in AppState
+		// Register agent in AppState
 		registerTask(taskState, setAppState)
 
 		logForDebugging(
@@ -258,7 +258,7 @@ export function killInProcessTeammate(
 		// Call cleanup handler
 		teammateTask.unregisterCleanup?.()
 
-		// Update task state and remove from teamContext.teammates
+		// Update agent state and remove from teamContext.teammates
 		killed = true
 
 		// Call pending idle callbacks to unblock any waiters (e.g., engine.waitForIdle)

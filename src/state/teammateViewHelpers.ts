@@ -21,7 +21,7 @@ function isLocalAgent(task: unknown): task is LocalAgentTaskState {
 }
 
 /**
- * Return the task released back to stub form: retain dropped, messages
+ * Return the agent released back to stub form: retain dropped, messages
  * cleared, evictAfter set if terminal. Shared by exitTeammateView and
  * the switch-away path in enterTeammateView.
  */

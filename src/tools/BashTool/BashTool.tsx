@@ -319,7 +319,7 @@ const outputSchema = lazySchema(() => z.object({
 	rawOutputPath: z.string().optional().describe('Path to raw output file for large MCP tool outputs'),
 	interrupted: z.boolean().describe('Whether the command was interrupted'),
 	isImage: z.boolean().optional().describe('Flag to indicate if stdout contains image data'),
-	backgroundTaskId: z.string().optional().describe('ID of the background task if command is running in background'),
+	backgroundTaskId: z.string().optional().describe('ID of the background agent if command is running in background'),
 	backgroundedByUser: z.boolean().optional().describe('True if the user manually backgrounded the command with Ctrl+B'),
 	assistantAutoBackgrounded: z.boolean().optional().describe('True if assistant-mode auto-backgrounded a long-running blocking command'),
 	dangerouslyDisableSandbox: z.boolean().optional().describe('Flag to indicate if sandbox mode was overridden'),
@@ -684,7 +684,7 @@ export const BashTool = buildTool({
 			const commandGenerator = runShellCommand({
 				input,
 				abortController,
-				// Use the always-shared task channel so async agents' background
+				// Use the always-shared agent channel so async agents' background
 				// bash tasks are actually registered (and killable on agent exit).
 				setAppState: toolUseContext.setAppStateForTasks ?? setAppState,
 				setToolJSX,
@@ -940,7 +940,7 @@ async function* runShellCommand({
 	// Start the command execution
 	const resultPromise = shellCommand.result;
 
-	// Helper to spawn a background task and return its ID
+	// Helper to spawn a background agent and return its ID
 	async function spawnBackgroundTask(): Promise<string> {
 		const handle = await spawnShellTask({
 			command,
@@ -962,7 +962,7 @@ async function* runShellCommand({
 
 	// Helper to start backgrounding with optional logging
 	function startBackgrounding(eventName: string, backgroundFn?: (shellId: string) => void): void {
-		// If a foreground task is already registered (via registerForeground in the
+		// If a foreground agent is already registered (via registerForeground in the
 		// progress loop), background it in-place instead of re-spawning. Re-spawning
 		// would overwrite tasks[taskId], emit a duplicate task_started SDK event,
 		// and leak the first cleanup callback.
@@ -978,13 +978,13 @@ async function* runShellCommand({
 			return;
 		}
 
-		// No foreground task registered — spawn a new background task
+		// No foreground agent registered — spawn a new background agent
 		// Note: spawn is essentially synchronous despite being async
 		void spawnBackgroundTask().then(shellId => {
 			backgroundShellId = shellId;
 
 			// Wake the generator's Promise.race so it sees backgroundShellId.
-			// Without this, if the poller has stopped ticking for this task
+			// Without this, if the poller has stopped ticking for this agent
 			// (no output + shared-poller race with sibling stopPolling calls)
 			// and the process is hung on I/O, the race at line ~1357 never
 			// resolves and the generator deadlocks despite being backgrounded.
@@ -1104,7 +1104,7 @@ async function* runShellCommand({
 					return fixedResult;
 				}
 				// Command has completed - return the actual result
-				// If we registered as a foreground task, unregister it
+				// If we registered as a foreground agent, unregister it
 				if (foregroundTaskId) {
 					unregisterForeground(foregroundTaskId, setAppState);
 				}
@@ -1126,7 +1126,7 @@ async function* runShellCommand({
 				};
 			}
 
-			// Check if this foreground task was backgrounded via backgroundAll()
+			// Check if this foreground agent was backgrounded via backgroundAll()
 			if (foregroundTaskId) {
 				// shellCommand.status becomes 'backgrounded' when background() is called
 				if (shellCommand.status === 'backgrounded') {
@@ -1148,7 +1148,7 @@ async function* runShellCommand({
 			// Show minimal backgrounding UI if available
 			// Skip if background tasks are disabled
 			if (!isBackgroundTasksDisabled && backgroundShellId === undefined && elapsedSeconds >= PROGRESS_THRESHOLD_MS / 1000 && setToolJSX) {
-				// Register this command as a foreground task so it can be backgrounded via Ctrl+B
+				// Register this command as a foreground agent so it can be backgrounded via Ctrl+B
 				if (!foregroundTaskId) {
 					foregroundTaskId = registerForeground({
 						command,

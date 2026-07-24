@@ -127,9 +127,9 @@ function getAutoBackgroundMs(): number {
 
 // Base input schema without multi-agent parameters
 const baseInputSchema = lazySchema(() => z.object({
-	description: z.string().describe('A short (3-5 word) description of the task'),
-	prompt: z.string().describe('The task for the agent to perform'),
-	subagent_type: z.string().optional().describe('The type of specialized agent to use for this task'),
+	description: z.string().describe('A short (3-5 word) description of the agent'),
+	prompt: z.string().describe('The agent for the agent to perform'),
+	subagent_type: z.string().optional().describe('The type of specialized agent to use for this agent'),
 	model: z.enum(['sonnet', 'opus', 'haiku']).optional().describe("Optional model override for this agent. Takes precedence over the agent definition's model frontmatter. If omitted, uses the agent definition's model, or inherits from the parent."),
 	run_in_background: z.boolean().optional().describe('Set to true to run this agent in the background. You will be notified when it completes.')
 }));
@@ -193,7 +193,7 @@ export const outputSchema = lazySchema(() => {
 	const asyncOutputSchema = z.object({
 		status: z.literal('async_launched'),
 		agentId: z.string().describe('The ID of the async agent'),
-		description: z.string().describe('The description of the task'),
+		description: z.string().describe('The description of the agent'),
 		prompt: z.string().describe('The prompt for the agent'),
 		outputFile: z.string().describe('Path to the output file for checking agent progress'),
 		canReadOutputFile: z.boolean().optional().describe('Whether the calling agent has Read/Bash tools to check progress')
@@ -302,7 +302,7 @@ export const AgentTool = buildTool({
 		const appState = toolUseContext.getAppState();
 		const permissionMode = appState.toolPermissionContext.mode;
 		// In-process teammates get a no-op setAppState; setAppStateForTasks
-		// reaches the root store so task registration/progress/kill stay visible.
+		// reaches the root store so agent registration/progress/kill stay visible.
 		const rootSetAppState = toolUseContext.setAppStateForTasks ?? toolUseContext.setAppState;
 
 		// Check if user is trying to use agent teams without access
@@ -377,7 +377,7 @@ export const AgentTool = buildTool({
 			// rewrite). Message-scan fallback catches any path where querySource
 			// wasn't threaded.
 			if (toolUseContext.options.querySource === `agent:builtin:${FORK_AGENT.agentType}` || isInForkChild(toolUseContext.messages)) {
-				throw new Error('Fork is not available inside a forked worker. Complete your task directly using your tools.');
+				throw new Error('Fork is not available inside a forked worker. Complete your agent directly using your tools.');
 			}
 			selectedAgent = FORK_AGENT;
 		} else {
@@ -603,7 +603,7 @@ export const AgentTool = buildTool({
 		const isCoordinator = feature('COORDINATOR_MODE') ? isEnvTruthy(process.env.CLAUDE_CODE_COORDINATOR_MODE) : false;
 
 		// Fork subagent experiment: force ALL spawns async for a unified
-		// <task-notification> interaction model (not just fork spawns — all of them).
+		// <agent-notification> interaction model (not just fork spawns — all of them).
 		const forceAsync = isForkSubagentEnabled();
 
 		// Assistant mode: force all agents async. Synchronous subagents hold the
@@ -611,7 +611,7 @@ export const AgentTool = buildTool({
 		// backs up, and the first overdue cron catch-up on spawn becomes N
 		// serial subagent turns blocking all user input. Same gate as
 		// executeForkedSlashCommand's fire-and-forget path; the
-		// <task-notification> re-entry there is handled by the else branch
+		// <agent-notification> re-entry there is handled by the else branch
 		// below (registerAsyncAgentTask + notifyOnCompletion).
 		const assistantForceAsync = feature('KAIROS') ? appState.kairosEnabled : false;
 		const shouldRunAsync = (run_in_background === true || selectedAgent.background === true || isCoordinator || forceAsync || assistantForceAsync || (proactiveModule?.isProactiveActive() ?? false)) && !isBackgroundTasksDisabled;
@@ -855,7 +855,7 @@ export const AgentTool = buildTool({
 					}
 				}
 
-				// Register as foreground task immediately so it can be backgrounded at any time
+				// Register as foreground agent immediately so it can be backgrounded at any time
 				// Skip registration if background tasks are disabled
 				let foregroundTaskId: string | undefined;
 				// Create the background race promise once outside the loop — otherwise
@@ -918,7 +918,7 @@ export const AgentTool = buildTool({
 					while (true) {
 						const elapsed = Date.now() - agentStartTime;
 
-						// Show background hint after threshold (but task is already registered)
+						// Show background hint after threshold (but agent is already registered)
 						// Skip if background tasks are disabled
 						if (!isBackgroundTasksDisabled && !backgroundHintShown && elapsed >= PROGRESS_THRESHOLD_MS && toolUseContext.setToolJSX) {
 							backgroundHintShown = true;
@@ -1001,7 +1001,7 @@ export const AgentTool = buildTool({
 										}
 										const agentResult = finalizeAgentTool(agentMessages, backgroundedTaskId, metadata);
 
-										// Mark task completed FIRST so TaskOutput(block=true)
+										// Mark agent completed FIRST so TaskOutput(block=true)
 										// unblocks immediately. classifyHandoffIfNeeded and
 										// cleanupWorktreeIfNeeded can hang — they must not gate
 										// the status transition (gh-20236).
@@ -1121,7 +1121,7 @@ export const AgentTool = buildTool({
 							const lastToolName = getLastToolUseName(message);
 							if (lastToolName) {
 								emitTaskProgress(syncTracker, foregroundTaskId, toolUseContext.toolUseId, description, agentStartTime, lastToolName);
-								// Keep AppState task.progress in sync when SDK summaries are
+								// Keep AppState agent.progress in sync when SDK summaries are
 								// enabled, so updateAgentSummary reads correct token/tool counts
 								// instead of zeros.
 								if (getSdkAgentProgressSummariesEnabled()) {
@@ -1216,7 +1216,7 @@ export const AgentTool = buildTool({
 					// closure owns a separate stop function (stopBackgroundedSummarization).
 					stopForegroundSummarization?.();
 
-					// Unregister foreground task if agent completed without being backgrounded
+					// Unregister foreground agent if agent completed without being backgrounded
 					if (foregroundTaskId) {
 						unregisterAgentForeground(foregroundTaskId, rootSetAppState);
 						// Notify SDK consumers (e.g. VS Code subagent panel) that this
@@ -1334,7 +1334,7 @@ export const AgentTool = buildTool({
 	userFacingName,
 	userFacingNameBackgroundColor,
 	getActivityDescription(input) {
-		return input?.description ?? 'Running task';
+		return input?.description ?? 'Running agent';
 	},
 	async checkPermissions(input, context): Promise<PermissionResult> {
 		const appState = context.getAppState();

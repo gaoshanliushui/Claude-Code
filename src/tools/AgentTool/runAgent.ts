@@ -317,7 +317,7 @@ export async function* runAgent({
 	/** Worktree path if the agent was spawned with isolation: "worktree".
 	 * Persisted to metadata so resume can restore the correct cwd. */
 	worktreePath?: string
-	/** Original task description from AgentTool input. Persisted to metadata
+	/** Original agent description from AgentTool input. Persisted to metadata
 	 * so a resumed agent's notification can show the original description. */
 	description?: string
 	/** Optional subdirectory under subagents/ to group this agent's transcript

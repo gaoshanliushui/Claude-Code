@@ -56,7 +56,7 @@ export async function resumeAgentBackground({
 	const startTime = Date.now()
 	const appState = toolUseContext.getAppState()
 	// In-process teammates get a no-op setAppState; setAppStateForTasks
-	// reaches the root store so task registration/progress/kill stay visible.
+	// reaches the root store so agent registration/progress/kill stay visible.
 	const rootSetAppState =
 		toolUseContext.setAppStateForTasks ?? toolUseContext.setAppState
 	const permissionMode = appState.toolPermissionContext.mode

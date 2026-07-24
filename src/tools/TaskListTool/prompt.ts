@@ -1,6 +1,6 @@
 import { isAgentSwarmsEnabled } from '../../utils/agentSwarmsEnabled.js'
 
-export const DESCRIPTION = 'List all tasks in the task list'
+export const DESCRIPTION = 'List all tasks in the agent list'
 
 export function getPrompt(): string {
   const teammateUseCase = isAgentSwarmsEnabled()

@@ -92,7 +92,7 @@ export function CancelRequestHandler(props: CancelRequestHandlerProps): null {
         streamMode as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
     }
 
-    // Priority 1: If there's an active task running, cancel it first
+    // Priority 1: If there's an active agent running, cancel it first
     // This takes precedence over queue management so users can always interrupt Claude
     if (abortSignal !== undefined && !abortSignal.aborted) {
       logEvent('tengu_cancel', cancelProps)
@@ -101,7 +101,7 @@ export function CancelRequestHandler(props: CancelRequestHandlerProps): null {
       return
     }
 
-    // Priority 2: Pop queue when Claude is idle (no running task to cancel)
+    // Priority 2: Pop queue when Claude is idle (no running agent to cancel)
     if (hasCommandsInQueue()) {
       if (popCommandFromQueue) {
         popCommandFromQueue()

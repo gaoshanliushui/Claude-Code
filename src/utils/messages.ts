@@ -215,7 +215,7 @@ export const REJECT_MESSAGE =
 export const REJECT_MESSAGE_WITH_REASON_PREFIX =
 	"The user doesn't want to proceed with this tool use. The tool use was rejected (eg. if it was a file edit, the new_string was NOT written to the file). To tell you how to proceed, the user said:\n"
 export const SUBAGENT_REJECT_MESSAGE =
-	'Permission for this tool use was denied. The tool use was rejected (eg. if it was a file edit, the new_string was NOT written to the file). Try a different approach or report the limitation to complete your task.'
+	'Permission for this tool use was denied. The tool use was rejected (eg. if it was a file edit, the new_string was NOT written to the file). Try a different approach or report the limitation to complete your agent.'
 export const SUBAGENT_REJECT_MESSAGE_WITH_REASON_PREFIX =
 	'Permission for this tool use was denied. The tool use was rejected (eg. if it was a file edit, the new_string was NOT written to the file). The user said:\n'
 export const PLAN_REJECTION_PREFIX =
@@ -3790,11 +3790,11 @@ Read the team config to discover your teammates' names. Check the task list peri
 		}
 		case 'queued_command': {
 			// Prefer explicit origin carried from the queue; fall back to commandMode
-			// for task notifications (which predate origin).
+			// for agent notifications (which predate origin).
 			const origin =
 				(attachment.origin ??
-					(attachment.commandMode === 'task-notification'
-						? {kind: 'task-notification'}
+					(attachment.commandMode === 'agent-notification'
+						? {kind: 'agent-notification'}
 						: undefined)) as MessageOrigin | undefined
 
 			// Only hide from the transcript if the queued command was itself
@@ -5561,7 +5561,7 @@ export function wrapCommandText(
 ): string {
 	const originObj = origin as { kind?: string; server?: string } | undefined
 	switch (originObj?.kind) {
-		case 'task-notification':
+		case 'agent-notification':
 			return `A background agent completed a task:\n${raw}`
 		case 'coordinator':
 			return `The coordinator sent a message while you were working:\n${raw}\n\nAddress this before completing your current task.`

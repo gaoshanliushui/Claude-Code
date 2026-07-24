@@ -1530,7 +1530,7 @@ const READONLY_COMMAND_REGEXES = new Set([
   // env and printenv removed - could expose sensitive environment variables
 
   // Development tools version checking - exact match only, no suffix allowed.
-  // SECURITY: `node -v --run <task>` would execute package.json scripts because
+  // SECURITY: `node -v --run <agent>` would execute package.json scripts because
   // Node processes --run before -v. Python/python3 --version are also anchored
   // for defense-in-depth. These were previously in EXTERNAL_READONLY_COMMANDS which
   // flows through makeRegexForSafeCommand and permits arbitrary suffixes.

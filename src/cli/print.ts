@@ -1946,7 +1946,7 @@ function runHeadlessStreaming(
 						)
 					}
 
-					// Non-prompt commands (task-notification, orphaned-permission) carry
+					// Non-prompt commands (agent-notification, orphaned-permission) carry
 					// side effects or orphanedPermission state, so they process singly.
 					// Prompt commands greedily collect followers with matching workload.
 					const batch: QueuedCommand[] = [command]
@@ -2068,7 +2068,7 @@ function runHeadlessStreaming(
 						// present — that means this is a terminal notification (completed/
 						// failed/stopped). Stream events from enqueueStreamEvent carry no
 						// <status> (they're progress pings); emitting them here would
-						// default to 'completed' and falsely close the task for SDK
+						// default to 'completed' and falsely close the agent for SDK
 						// consumers. Terminal bookends are now emitted directly via
 						// emitTaskTerminatedSdk, so skipping statusless events is safe.
 						if (statusMatch) {
@@ -2808,7 +2808,7 @@ function runHeadlessStreaming(
 		flow: Promise<void>
 	} | null = null
 
-	// This is essentially spawning a parallel async task- we have two
+	// This is essentially spawning a parallel async agent- we have two
 	// running in parallel- one reading from stdin and adding to the
 	// queue to be processed and another reading from the queue,
 	// processing and returning the result of the generation.

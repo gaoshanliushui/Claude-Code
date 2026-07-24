@@ -18,8 +18,8 @@ const DEBOUNCE_MS = 50
 const FALLBACK_POLL_MS = 5000 // Fallback in case fs.watch misses events
 
 /**
- * Singleton store for the TodoV2 task list. Owns the file watcher, timers,
- * and cached task list. Multiple hook instances (REPL, Spinner,
+ * Singleton store for the TodoV2 agent list. Owns the file watcher, timers,
+ * and cached agent list. Multiple hook instances (REPL, Spinner,
  * PromptInputFooterLeftSide) subscribe to one shared store instead of each
  * setting up their own fs.watch on the same directory. The Spinner mounts/
  * unmounts every turn — per-hook watchers caused constant watch/unwatch churn.
@@ -31,7 +31,7 @@ class TasksV2Store {
   #tasks: Task[] | undefined = undefined
   /**
    * Set when the hide timer has elapsed (all tasks completed for >5s), or
-   * when the task list is empty. Starts false so the first fetch runs the
+   * when the agent list is empty. Starts false so the first fetch runs the
    * "all completed → schedule 5s hide" path (matches original behavior:
    * resuming a session with completed tasks shows them briefly).
    */
@@ -84,7 +84,7 @@ class TasksV2Store {
 
   /**
    * Point the file watcher at the current tasks directory. Called on start
-   * and whenever #fetch detects the task list ID has changed (e.g. when
+   * and whenever #fetch detects the agent list ID has changed (e.g. when
    * TeamCreateTool sets leaderTeamName mid-session).
    */
   #rewatch(dir: string): void {
@@ -153,7 +153,7 @@ class TasksV2Store {
 
   #onHideTimerFired(scheduledForTaskListId: string): void {
     this.#hideTimer = null
-    // Bail if the task list ID changed since scheduling (team created/deleted
+    // Bail if the agent list ID changed since scheduling (team created/deleted
     // during the 5s window) — don't reset the wrong list.
     const currentId = getTaskListId()
     if (currentId !== scheduledForTaskListId) return
@@ -210,7 +210,7 @@ const NOOP_SUBSCRIBE = (): (() => void) => NOOP
 const NOOP_SNAPSHOT = (): undefined => undefined
 
 /**
- * Hook to get the current task list for the persistent UI display.
+ * Hook to get the current agent list for the persistent UI display.
  * Returns tasks when TodoV2 is enabled, otherwise returns undefined.
  * All hook instances share a single file watcher via TasksV2Store.
  * Hides the list after 5 seconds if there are no open tasks.
@@ -229,7 +229,7 @@ export function useTasksV2(): Task[] | undefined {
 }
 
 /**
- * Same as useTasksV2, plus collapses the expanded task view when the list
+ * Same as useTasksV2, plus collapses the expanded agent view when the list
  * becomes hidden. Call this from exactly one always-mounted component (REPL)
  * so the collapse effect runs once instead of N× per consumer.
  */

@@ -12,7 +12,7 @@ import { getTaskOutputDir } from '../../utils/task/diskOutput.js';
 import type { Input, Output } from './FileReadTool.js';
 
 /**
- * Check if a file path is an agent output file and extract the task ID.
+ * Check if a file path is an agent output file and extract the agent ID.
  * Agent output files follow the pattern: {projectTempDir}/tasks/{taskId}.output
  */
 function getAgentOutputTaskId(filePath: string): string | null {
@@ -20,7 +20,7 @@ function getAgentOutputTaskId(filePath: string): string | null {
   const suffix = '.output';
   if (filePath.startsWith(prefix) && filePath.endsWith(suffix)) {
     const taskId = filePath.slice(prefix.length, -suffix.length);
-    // Validate it looks like a task ID (alphanumeric, reasonable length)
+    // Validate it looks like a agent ID (alphanumeric, reasonable length)
     if (taskId.length > 0 && taskId.length <= 20 && /^[a-zA-Z0-9_-]+$/.test(taskId)) {
       return taskId;
     }
@@ -42,7 +42,7 @@ export function renderToolUseMessage({
   }
 
   // For agent output files, return empty string so no parentheses are shown
-  // The task ID is displayed separately by AssistantToolUseMessage
+  // The agent ID is displayed separately by AssistantToolUseMessage
   if (getAgentOutputTaskId(file_path)) {
     return '';
   }
@@ -68,7 +68,7 @@ export function renderToolUseTag({
 }: Partial<Input>): React.ReactNode {
   const agentTaskId = file_path ? getAgentOutputTaskId(file_path) : null;
 
-  // Show agent task ID for Read tool when reading agent output
+  // Show agent agent ID for Read tool when reading agent output
   if (!agentTaskId) {
     return null;
   }
@@ -175,7 +175,7 @@ export function getToolUseSummary(input: Partial<Input> | undefined): string | n
   if (!input?.file_path) {
     return null;
   }
-  // For agent output files, just show the task ID
+  // For agent output files, just show the agent ID
   const agentTaskId = getAgentOutputTaskId(input.file_path);
   if (agentTaskId) {
     return agentTaskId;

@@ -41,12 +41,12 @@ export type RemoteAgentTaskState = TaskStateBase & {
    */
   isLongRunning?: boolean;
   /**
-   * When the local poller started watching this task (at spawn or on restore).
+   * When the local poller started watching this agent (at spawn or on restore).
    * Review timeout clocks from here so a restore doesn't immediately time out
-   * a task spawned >30min ago.
+   * a agent spawned >30min ago.
    */
   pollStartedAt: number;
-  /** True when this task was created by a teleported /ultrareview command. */
+  /** True when this agent was created by a teleported /ultrareview command. */
   isRemoteReview?: boolean;
   /** Parsed from the orchestrator's <remote-review-progress> heartbeat echoes. */
   reviewProgress?: {
@@ -78,14 +78,14 @@ export type RemoteTaskMetadata = AutofixPrRemoteTaskMetadata;
 
 /**
  * Called on every poll tick for tasks with a matching remoteTaskType. Return a
- * non-null string to complete the task (string becomes the notification text),
+ * non-null string to complete the agent (string becomes the notification text),
  * or null to keep polling. Checkers that hit external APIs should self-throttle.
  */
 export type RemoteTaskCompletionChecker = (remoteTaskMetadata: RemoteTaskMetadata | undefined) => Promise<string | null>;
 const completionCheckers = new Map<RemoteTaskType, RemoteTaskCompletionChecker>();
 
 /**
- * Register a completion checker for a remote task type. Invoked on every poll
+ * Register a completion checker for a remote agent type. Invoked on every poll
  * tick; survives --resume via the sidecar's remoteTaskType + remoteTaskMetadata.
  */
 export function registerCompletionChecker(remoteTaskType: RemoteTaskType, checker: RemoteTaskCompletionChecker): void {
@@ -94,7 +94,7 @@ export function registerCompletionChecker(remoteTaskType: RemoteTaskType, checke
 
 /**
  * Persist a remote-agent metadata entry to the session sidecar.
- * Fire-and-forget — persistence failures must not block task registration.
+ * Fire-and-forget — persistence failures must not block agent registration.
  */
 async function persistRemoteAgentMetadata(meta: RemoteAgentMetadata): Promise<void> {
   try {
@@ -106,7 +106,7 @@ async function persistRemoteAgentMetadata(meta: RemoteAgentMetadata): Promise<vo
 
 /**
  * Remove a remote-agent metadata entry from the session sidecar.
- * Called on task completion/kill so restored sessions don't resurrect
+ * Called on agent completion/kill so restored sessions don't resurrect
  * tasks that already finished.
  */
 async function removeRemoteAgentMetadata(taskId: string): Promise<void> {
@@ -168,7 +168,7 @@ export function formatPreconditionError(error: BackgroundRemoteSessionPreconditi
 }
 
 /**
- * Enqueue a remote task notification to the message queue.
+ * Enqueue a remote agent notification to the message queue.
  */
 function enqueueRemoteNotification(taskId: string, title: string, status: 'completed' | 'failed' | 'killed', setAppState: SetAppState, toolUseId?: string): void {
   // Atomically check and set notified flag to prevent duplicate notifications.
@@ -190,7 +190,7 @@ function enqueueRemoteNotification(taskId: string, title: string, status: 'compl
 }
 
 /**
- * Atomically mark a task as notified. Returns true if this call flipped the
+ * Atomically mark a agent as notified. Returns true if this call flipped the
  * flag (caller should enqueue), false if already notified (caller should skip).
  */
 function markTaskNotified(taskId: string, setAppState: SetAppState): boolean {
@@ -386,8 +386,8 @@ function extractTodoListFromLog(log: SDKMessage[]): TodoList {
 }
 
 /**
- * Register a remote agent task in the unified task framework.
- * Bundles task ID generation, output init, state creation, registration, and polling.
+ * Register a remote agent agent in the unified agent framework.
+ * Bundles agent ID generation, output init, state creation, registration, and polling.
  * Callers remain responsible for custom pre-registration logic (git dialogs, transcript upload, teleport options).
  */
 export function registerRemoteAgentTask(options: {
@@ -421,7 +421,7 @@ export function registerRemoteAgentTask(options: {
   } = options;
   const taskId = generateTaskId('remote_agent');
 
-  // Create the output file before registering the task.
+  // Create the output file before registering the agent.
   // RemoteAgentTask uses appendTaskOutput() (not TaskOutput), so
   // the file must exist for readers before any output arrives.
   void initTaskOutput(taskId);
@@ -680,7 +680,7 @@ function startRemoteSessionPolling(taskId: string, context: TaskContext): () => 
       // is the discriminator — bughunter mode always has one (run_hunt.sh),
       // prompt mode never does — and it arrives before the kickoff
       // post_stage so there's no race. When the hook is running, only the
-      // <remote-review> tag or the 30min timeout complete the task.
+      // <remote-review> tag or the 30min timeout complete the agent.
       // Filtering on hook_event avoids a (theoretical) non-SessionStart hook
       // in prompt mode from blocking stableIdle — the code_review container
       // only registers SessionStart, but the 30min-hang failure mode is
@@ -693,7 +693,7 @@ function startRemoteSessionPolling(taskId: string, context: TaskContext): () => 
       const reviewTimedOut = task.isRemoteReview && Date.now() - task.pollStartedAt > REMOTE_REVIEW_TIMEOUT_MS;
       const newStatus = result ? result.subtype === 'success' ? 'completed' as const : 'failed' as const : sessionDone || reviewTimedOut ? 'completed' as const : accumulatedLog.length > 0 ? 'running' as const : 'starting' as const;
 
-      // Update task state. Guard against terminal states — if stopTask raced
+      // Update agent state. Guard against terminal states — if stopTask raced
       // while pollRemoteSessionEvents was in-flight (status set to 'killed',
       // notified set to true), bail without overwriting status or proceeding to
       // side effects (notification, permission-mode flip).
@@ -726,13 +726,13 @@ function startRemoteSessionPolling(taskId: string, context: TaskContext): () => 
       });
       if (raceTerminated) return;
 
-      // Send notification if task completed or timed out
+      // Send notification if agent completed or timed out
       if (result || sessionDone || reviewTimedOut) {
         const finalStatus = result && result.subtype !== 'success' ? 'failed' : 'completed';
 
         // For remote-review tasks: inject the review text directly into the
         // message queue. No mode change, no file indirection — the local model
-        // just sees the review appear as a task-notification on its next turn.
+        // just sees the review appear as a agent-notification on its next turn.
         // Session kept alive — run_hunt.sh's post_stage() has already written
         // the formatted findings as an assistant event, so the claude.ai URL
         // stays a durable record the user can revisit. TTL handles cleanup.
@@ -855,7 +855,7 @@ export const RemoteAgentTask: Task = {
 };
 
 /**
- * Get the session URL for a remote task.
+ * Get the session URL for a remote agent.
  */
 export function getRemoteTaskSessionUrl(sessionId: string): string {
   return getRemoteSessionUrl(sessionId, process.env.SESSION_INGRESS_URL);

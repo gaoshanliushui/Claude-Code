@@ -82,7 +82,7 @@ export function useScheduledTasks({
       })
 
     const scheduler = createCronScheduler({
-      // Missed-task surfacing (onFire fallback). Teammate crons are always
+      // Missed-agent surfacing (onFire fallback). Teammate crons are always
       // session-only (durable:false) so they never appear in the missed list,
       // which is populated from disk at scheduler startup — this path only
       // handles team-lead durable crons.

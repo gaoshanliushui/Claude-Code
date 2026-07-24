@@ -67,7 +67,7 @@ const DEFAULT_MAIN_SESSION_AGENT: CustomAgentDefinition = {
 }
 
 /**
- * Generate a unique task ID for main session tasks.
+ * Generate a unique agent ID for main session tasks.
  * Uses 's' prefix to distinguish from agent tasks ('a' prefix).
  */
 const TASK_ID_ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyz'
@@ -82,14 +82,14 @@ function generateMainSessionTaskId(): string {
 }
 
 /**
- * Register a backgrounded main session task.
+ * Register a backgrounded main session agent.
  * Called when the user backgrounds the current session query.
  *
- * @param description - Description of the task
+ * @param description - Description of the agent
  * @param setAppState - State setter function
  * @param mainThreadAgentDefinition - Optional agent definition if running with --agent
  * @param existingAbortController - Optional abort controller to reuse (for backgrounding an active query)
- * @returns Object with task ID and abort signal for stopping the background query
+ * @returns Object with agent ID and abort signal for stopping the background query
  */
 export function registerMainSessionTask(
 	description: string,
@@ -99,10 +99,10 @@ export function registerMainSessionTask(
 ): { taskId: string; abortSignal: AbortSignal } {
 	const taskId = generateMainSessionTaskId()
 
-	// Link output to an isolated per-task transcript file (same layout as
+	// Link output to an isolated per-agent transcript file (same layout as
 	// sub-agents). Do NOT use getTranscriptPath() — that's the main session's
 	// file, and writing there from a background query after /clear would corrupt
-	// the post-clear conversation. The isolated path lets this task survive
+	// the post-clear conversation. The isolated path lets this agent survive
 	// /clear: the symlink re-link in clearConversation handles session ID changes.
 	void initTaskOutputAsSymlink(
 		taskId,
@@ -110,7 +110,7 @@ export function registerMainSessionTask(
 	)
 
 	// Use the existing abort controller if provided (important for backgrounding an active query)
-	// This ensures that aborting the task will abort the actual query
+	// This ensures that aborting the agent will abort the actual query
 	const abortController = existingAbortController ?? createAbortController()
 
 	const unregisterCleanup = registerCleanup(async () => {
@@ -124,7 +124,7 @@ export function registerMainSessionTask(
 	// Use provided agent definition or default
 	const selectedAgent = mainThreadAgentDefinition ?? DEFAULT_MAIN_SESSION_AGENT
 
-	// Create task state - already backgrounded since this is called when user backgrounds
+	// Create agent state - already backgrounded since this is called when user backgrounds
 	const taskState: LocalMainSessionTaskState = {
 		...createTaskStateBase(taskId, 'local_agent', description),
 		type: 'local_agent',
@@ -149,7 +149,7 @@ export function registerMainSessionTask(
 	)
 	registerTask(taskState, setAppState)
 
-	// Verify task was registered by checking state
+	// Verify agent was registered by checking state
 	setAppState(prev => {
 		const hasTask = taskId in prev.tasks
 		logForDebugging(
@@ -162,7 +162,7 @@ export function registerMainSessionTask(
 }
 
 /**
- * Complete the main session task and send notification.
+ * Complete the main session agent and send notification.
  * Called when the backgrounded query finishes.
  */
 export function completeMainSessionTask(
@@ -178,7 +178,7 @@ export function completeMainSessionTask(
 			return task
 		}
 
-		// Track if task was backgrounded (for notification decision)
+		// Track if agent was backgrounded (for notification decision)
 		wasBackgrounded = task.isBackgrounded ?? true
 		toolUseId = task.toolUseId
 
@@ -194,7 +194,7 @@ export function completeMainSessionTask(
 
 	void evictTaskOutput(taskId)
 
-	// Only send notification if task is still backgrounded (not foregrounded)
+	// Only send notification if agent is still backgrounded (not foregrounded)
 	// If foregrounded, user is watching it directly - no notification needed
 	if (wasBackgrounded) {
 		enqueueMainSessionNotification(
@@ -263,9 +263,9 @@ function enqueueMainSessionNotification(
 }
 
 /**
- * Foreground a main session task - mark it as foregrounded so its output
+ * Foreground a main session agent - mark it as foregrounded so its output
  * appears in the main view. The background query keeps running.
- * Returns the task's accumulated messages, or undefined if task not found.
+ * Returns the agent's accumulated messages, or undefined if agent not found.
  */
 export function foregroundMainSessionTask(
 	taskId: string,
@@ -281,7 +281,7 @@ export function foregroundMainSessionTask(
 
 		taskMessages = (task as LocalMainSessionTaskState).messages
 
-		// Restore previous foregrounded task to background if it exists
+		// Restore previous foregrounded agent to background if it exists
 		const prevId = prev.foregroundedTaskId
 		const prevTask = prevId ? prev.tasks[prevId] : undefined
 		const restorePrev =
@@ -302,7 +302,7 @@ export function foregroundMainSessionTask(
 }
 
 /**
- * Check if a task is a main session task (vs a regular agent task).
+ * Check if a agent is a main session agent (vs a regular agent agent).
  */
 export function isMainSessionTask(
 	task: unknown,
@@ -333,7 +333,7 @@ type ToolActivity = {
  * Start a fresh background session with the given messages.
  *
  * Spawns an independent query() call with the current messages and registers it
- * as a background task. The caller's foreground query continues running normally.
+ * as a background agent. The caller's foreground query continues running normally.
  */
 export function startBackgroundSession({
 										   messages,
@@ -354,16 +354,16 @@ export function startBackgroundSession({
 		agentDefinition,
 	)
 
-	// Persist the pre-backgrounding conversation to the task's isolated
+	// Persist the pre-backgrounding conversation to the agent's isolated
 	// transcript so TaskOutput shows context immediately. Subsequent messages
 	// are written incrementally below.
 	void recordSidechainTranscript(messages, taskId).catch(err =>
 		logForDebugging(`bg-session initial transcript write failed: ${err}`),
 	)
 
-	// Wrap in agent context so skill invocations scope to this task's agentId
+	// Wrap in agent context so skill invocations scope to this agent's agentId
 	// (not null). This lets clearInvokedSkills(preservedAgentIds) selectively
-	// preserve this task's skills across /clear. AsyncLocalStorage isolates
+	// preserve this agent's skills across /clear. AsyncLocalStorage isolates
 	// concurrent async chains — this wrapper doesn't affect the foreground.
 	const agentContext: SubagentContext = {
 		agentId: taskId,

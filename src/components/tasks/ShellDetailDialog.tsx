@@ -28,7 +28,7 @@ type TaskOutputResult = {
 };
 
 /**
- * Read the tail of the task output file. Only reads the last few KB,
+ * Read the tail of the agent output file. Only reads the last few KB,
  * not the entire file.
  */
 async function getTaskOutput(shell: DeepImmutable<LocalShellTaskState>): Promise<TaskOutputResult> {

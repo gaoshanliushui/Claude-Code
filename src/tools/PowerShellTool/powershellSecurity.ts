@@ -836,7 +836,7 @@ function checkInvokeItem(
 }
 
 /**
- * Scheduled-task persistence primitives. Register-ScheduledJob was blocked
+ * Scheduled-agent persistence primitives. Register-ScheduledJob was blocked
  * (DANGEROUS_SCRIPT_BLOCK_CMDLETS); the newer Register-ScheduledTask cmdlet
  * and legacy schtasks.exe /create were not. Persistence that survives the
  * session with no explanatory prompt.

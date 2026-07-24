@@ -105,7 +105,7 @@ export function filterToolsForAgent({
 				if (toolMatchesName(tool, AGENT_TOOL_NAME)) {
 					return true
 				}
-				// Allow task tools for in-process teammates to coordinate via shared task list
+				// Allow agent tools for in-process teammates to coordinate via shared agent list
 				if (IN_PROCESS_TEAMMATE_ALLOWED_TOOLS.has(tool.name)) {
 					return true
 				}
@@ -555,7 +555,7 @@ export async function runAsyncAgentLifecycle({
 			: undefined
 		for await (const message of makeStream(onCacheSafeParams)) {
 			agentMessages.push(message)
-			// Append immediately when UI holds the task (retain). Bootstrap reads
+			// Append immediately when UI holds the agent (retain). Bootstrap reads
 			// disk in parallel and UUID-merges the prefix — disk-write-before-yield
 			// means live is always a suffix of disk, so merge is order-correct.
 			rootSetAppState(prev => {
@@ -598,7 +598,7 @@ export async function runAsyncAgentLifecycle({
 
 		const agentResult = finalizeAgentTool(agentMessages, taskId, metadata)
 
-		// Mark task completed FIRST so TaskOutput(block=true) unblocks
+		// Mark agent completed FIRST so TaskOutput(block=true) unblocks
 		// immediately. classifyHandoffIfNeeded (API call) and getWorktreeResult
 		// (git exec) are notification embellishments that can hang — they must
 		// not gate the status transition (gh-20236).

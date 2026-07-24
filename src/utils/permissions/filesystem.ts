@@ -1725,7 +1725,7 @@ export function checkReadableInternalPath(
     }
   }
 
-  // Tasks directory (~/.claude/tasks/) for swarm task coordination
+  // Tasks directory (~/.claude/tasks/) for swarm agent coordination
   const tasksDir = join(getClaudeConfigHomeDir(), 'tasks') + sep
   if (
     normalizedPath === tasksDir.slice(0, -1) ||

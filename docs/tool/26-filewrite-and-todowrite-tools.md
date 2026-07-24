@@ -4,7 +4,7 @@
 > - `src/tools/FileWriteTool/FileWriteTool.ts`（435 行）
 > - `src/tools/TodoWriteTool/TodoWriteTool.ts`（115 行）
 >
-> 关联文档：[`docs/11-tool-execution.md`](11-tool-execution.md) · [`docs/18-task-planning.md`](../task/18-task-planning.md) · [`docs/23-design-and-core-modules.md`](../architecture/23-design-and-core-modules.md)
+> 关联文档：[`docs/11-tool-execution.md`](11-tool-execution.md) · [`docs/18-task-planning.md`](../agent/18-task-planning.md) · [`docs/23-design-and-core-modules.md`](../architecture/23-design-and-core-modules.md)
 
 这两个工具属于 Claude Code 最常用、也最能体现 "**写文件 + 跟踪任务**" 这两条核心交互路径。FileWriteTool 负责把模型给出的内容落到磁盘，TodoWriteTool 负责把模型的"打算做什么"显式化给用户并固化在 AppState 里。
 
@@ -813,6 +813,6 @@ T=140s 所有 7 项 todo 都标记 completed
 
 - [`docs/11-tool-execution.md`](11-tool-execution.md) —— 工具执行路径
 - [`docs/14-tool-hooks.md`](14-tool-hooks.md) —— FileWrite/FileEdit 的 PreToolUse/PostToolUse 钩子
-- [`docs/18-task-planning.md`](../task/18-task-planning.md) —— TodoWrite 与 TaskCreate 的 V1/V2 切换
+- [`docs/18-task-planning.md`](../agent/18-task-planning.md) —— TodoWrite 与 TaskCreate 的 V1/V2 切换
 - [`docs/24-snake-game-request-flow.md`](../architecture/24-snake-game-request-flow.md) —— 这两个工具在端到端 case 中的实际调用
 - [`docs/25-streaming-tool-executor.md`](25-streaming-tool-executor.md) —— 并发执行器对这两个工具的处理（FileWrite 通常 isConcurrencySafe，TodoWrite 总是 safe）

@@ -90,7 +90,7 @@ function computeSearchText(msg: RenderableMessage): string {
 				// UserTextMessage (AttachmentMessage.tsx:~348). stickyPromptText
 				// (VirtualMessageList.tsx:~103) has the same guards — mirror here.
 				msg.attachment.type === 'queued_command' &&
-				msg.attachment.commandMode !== 'task-notification' &&
+				msg.attachment.commandMode !== 'agent-notification' &&
 				!msg.attachment.isMeta
 			) {
 				const p = msg.attachment.prompt

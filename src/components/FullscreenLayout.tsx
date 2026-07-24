@@ -56,9 +56,9 @@ type Props = {
    *  shows while viewport bottom hasn't reached this. Ref so REPL doesn't
    *  re-render on the one-shot snapshot write. */
   dividerYRef?: RefObject<number | null>;
-  /** Force-hide the pill (e.g. viewing a sub-agent task). */
+  /** Force-hide the pill (e.g. viewing a sub-agent agent). */
   hidePill?: boolean;
-  /** Force-hide the sticky prompt header (e.g. viewing a teammate task). */
+  /** Force-hide the sticky prompt header (e.g. viewing a teammate agent). */
   hideSticky?: boolean;
   /** Count for the pill text. 0 → "Jump to bottom", >0 → "N new messages". */
   newMessageCount?: number;

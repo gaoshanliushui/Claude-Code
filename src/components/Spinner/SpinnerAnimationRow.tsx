@@ -75,7 +75,7 @@ export type SpinnerAnimationRowProps = {
  *
  * The parent SpinnerWithVerb is freed from the 50ms render loop and only
  * re-renders when its props/app state change (~25x/turn instead of ~383x).
- * That keeps the outer Box shells, useAppState selectors, task filtering,
+ * That keeps the outer Box shells, useAppState selectors, agent filtering,
  * and tip/tree subtrees out of the hot animation path.
  */
 export function SpinnerAnimationRow({

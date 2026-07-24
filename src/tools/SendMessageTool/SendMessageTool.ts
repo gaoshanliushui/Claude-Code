@@ -819,7 +819,7 @@ export const SendMessageTool: Tool<InputSchema, SendMessageToolOutput> =
 								},
 							}
 						}
-						// task exists but stopped — auto-resume
+						// agent exists but stopped — auto-resume
 						try {
 							const result = await resumeAgentBackground({
 								agentId,
@@ -843,7 +843,7 @@ export const SendMessageTool: Tool<InputSchema, SendMessageToolOutput> =
 							}
 						}
 					} else {
-						// task evicted from state — try resume from disk transcript.
+						// agent evicted from state — try resume from disk transcript.
 						// agentId is either a registered name or a format-matching raw ID
 						// (toAgentId validates the createAgentId format, so teammate names
 						// never reach this block).

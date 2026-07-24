@@ -353,7 +353,7 @@ export function registerScheduleRemoteAgentsSkill(): void {
         return [
           {
             type: 'text',
-            text: "We're having trouble connecting with your remote claude.ai account to set up a scheduled task. Please try /schedule again in a few minutes.",
+            text: "We're having trouble connecting with your remote claude.ai account to set up a scheduled agent. Please try /schedule again in a few minutes.",
           },
         ]
       }

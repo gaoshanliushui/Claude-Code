@@ -1078,7 +1078,7 @@ function configureFeatureGatedOptions(program: CommanderCommand): void {
 		program.addOption(new Option('--afk', '[ANT-ONLY] Deprecated alias for --permission-mode auto.').hideHelp().implies({
 			permissionMode: 'auto'
 		}));
-		program.addOption(new Option('--tasks [id]', '[ANT-ONLY] Tasks mode: watch for tasks and auto-process them. Optional id is used as both the task list ID and agent ID (defaults to "tasklist").').argParser(String).hideHelp());
+		program.addOption(new Option('--tasks [id]', '[ANT-ONLY] Tasks mode: watch for tasks and auto-process them. Optional id is used as both the agent list ID and agent ID (defaults to "tasklist").').argParser(String).hideHelp());
 		program.option('--agent-teams', '[ANT-ONLY] Force Claude to use multi-agent mode for solving problems', () => true);
 	}
 	if (feature('TRANSCRIPT_CLASSIFIER')) {
@@ -1226,10 +1226,10 @@ async function run(): Promise<CommanderCommand> {
 			throw new Error('--max-budget-usd must be a positive number greater than 0');
 		}
 		return amount;
-	})).addOption(new Option('--task-budget <tokens>', 'API-side task budget in tokens (output_config.task_budget)').argParser(value => {
+	})).addOption(new Option('--agent-budget <tokens>', 'API-side agent budget in tokens (output_config.task_budget)').argParser(value => {
 		const tokens = Number(value);
 		if (isNaN(tokens) || tokens <= 0 || !Number.isInteger(tokens)) {
-			throw new Error('--task-budget must be a positive integer');
+			throw new Error('--agent-budget must be a positive integer');
 		}
 		return tokens;
 	}).hideHelp()).option('--replay-user-messages', 'Re-emit user messages from stdin back on stdout for acknowledgment (only works with --input-format=stream-json and --output-format=stream-json)', () => true).addOption(new Option('--enable-auth-status', 'Enable auth status messages in SDK mode').default(false).hideHelp()).option('--allowedTools, --allowed-tools <tools...>', 'Comma or space-separated list of tool names to allow (e.g. "Bash(git:*) Edit")').option('--tools <tools...>', 'Specify the list of available tools from the built-in set. Use "" to disable all tools, "default" to use all tools, or specify tool names (e.g. "Bash,Edit,Read").').option('--disallowedTools, --disallowed-tools <tools...>', 'Comma or space-separated list of tool names to deny (e.g. "Bash(git:*) Edit")').option('--mcp-config <configs...>', 'Load MCP servers from JSON files or strings (space-separated)').addOption(new Option('--permission-prompt-tool <tool>', 'MCP tool to use for permission prompts (only works with --print)').argParser(String).hideHelp()).addOption(new Option('--system-prompt <prompt>', 'System prompt to use for the session').argParser(String)).addOption(new Option('--system-prompt-file <file>', 'Read system prompt from a file').argParser(String).hideHelp()).addOption(new Option('--append-system-prompt <prompt>', 'Append a system prompt to the default system prompt').argParser(String)).addOption(new Option('--append-system-prompt-file <file>', 'Read system prompt from a file and append to the default system prompt').argParser(String).hideHelp()).addOption(new Option('--permission-mode <mode>', 'Permission mode to use for the session').argParser(String).choices(PERMISSION_MODES)).option('-c, --continue', 'Continue the most recent conversation in the current directory', () => true).option('-r, --resume [value]', 'Resume a conversation by session ID, or open interactive picker with optional search term', value => value || true).option('--fork-session', 'When resuming, create a new session ID instead of reusing the original (use with --resume or --continue)', () => true).addOption(new Option('--prefill <text>', 'Pre-fill the prompt input with text without submitting it').hideHelp()).addOption(new Option('--deep-link-origin', 'Signal that this session was launched from a deep link').hideHelp()).addOption(new Option('--deep-link-repo <slug>', 'Repo slug the deep link ?repo= parameter resolved to the current cwd').hideHelp()).addOption(new Option('--deep-link-last-fetch <ms>', 'FETCH_HEAD mtime in epoch ms, precomputed by the deep link trampoline').argParser(v => {
@@ -3665,7 +3665,7 @@ async function run(): Promise<CommanderCommand> {
 				// Check if TUI mode is enabled - description is only optional in TUI mode
 				const isRemoteTuiEnabled = getFeatureValue_CACHED_MAY_BE_STALE('tengu_remote_backend', false);
 				if (!isRemoteTuiEnabled && !hasInitialPrompt) {
-					return await exitWithError(root, 'Error: --remote requires a description.\nUsage: claude --remote "your task description"', () => gracefulShutdown(1));
+					return await exitWithError(root, 'Error: --remote requires a description.\nUsage: claude --remote "your agent description"', () => gracefulShutdown(1));
 				}
 				logEvent('tengu_remote_create_session', {
 					has_initial_prompt: String(hasInitialPrompt) as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS
@@ -3755,7 +3755,7 @@ async function run(): Promise<CommanderCommand> {
 				return;
 			} else if (teleport) {
 				if (teleport === true || teleport === '') {
-					// Interactive mode: show task selector and handle resume
+					// Interactive mode: show agent selector and handle resume
 					logEvent('tengu_teleport_interactive_mode', {});
 					logForDebugging('selectAndResumeTeleportTask: Starting teleport flow...');
 					const teleportResult = await launchTeleportResumeWrapper(root);
@@ -4064,7 +4064,7 @@ async function run(): Promise<CommanderCommand> {
 	profileCheckpoint('run_main_options_built');
 
 	// -p/--print mode: skip subcommand registration. The 52 subcommands
-	// (mcp, auth, plugin, skill, task, config, doctor, update, etc.) are
+	// (mcp, auth, plugin, skill, agent, config, doctor, update, etc.) are
 	// never dispatched in print mode — commander routes the prompt to the
 	// default action. The subcommand registration path was measured at ~65ms
 	// on baseline — mostly the isBridgeEnabled() call (25ms settings Zod parse
@@ -4628,8 +4628,8 @@ Examples:
 			await exportHandler(source, outputFile);
 		});
 		if (("external" as string) === 'ant') {
-			const taskCmd = program.command('task').description('[ANT-ONLY] Manage task list tasks');
-			taskCmd.command('create <subject>').description('Create a new task').option('-d, --description <text>', 'Task description').option('-l, --list <id>', 'Task list ID (defaults to "tasklist")').action(async (subject: string, opts: {
+			const taskCmd = program.command('task').description('[ANT-ONLY] Manage agent list tasks');
+			taskCmd.command('create <subject>').description('Create a new agent').option('-d, --description <text>', 'Task description').option('-l, --list <id>', 'Task list ID (defaults to "tasklist")').action(async (subject: string, opts: {
 				description?: string;
 				list?: string;
 			}) => {
@@ -4648,7 +4648,7 @@ Examples:
 				} = await import('./cli/handlers/ant.js');
 				await taskListHandler(opts);
 			});
-			taskCmd.command('get <id>').description('Get details of a task').option('-l, --list <id>', 'Task list ID (defaults to "tasklist")').action(async (id: string, opts: {
+			taskCmd.command('get <id>').description('Get details of a agent').option('-l, --list <id>', 'Task list ID (defaults to "tasklist")').action(async (id: string, opts: {
 				list?: string;
 			}) => {
 				const {
@@ -4656,7 +4656,7 @@ Examples:
 				} = await import('./cli/handlers/ant.js');
 				await taskGetHandler(id, opts);
 			});
-			taskCmd.command('update <id>').description('Update a task').option('-l, --list <id>', 'Task list ID (defaults to "tasklist")').option('-s, --status <status>', `Set status (${TASK_STATUSES.join(', ')})`).option('--subject <text>', 'Update subject').option('-d, --description <text>', 'Update description').option('--owner <agentId>', 'Set owner').option('--clear-owner', 'Clear owner').action(async (id: string, opts: {
+			taskCmd.command('update <id>').description('Update a agent').option('-l, --list <id>', 'Task list ID (defaults to "tasklist")').option('-s, --status <status>', `Set status (${TASK_STATUSES.join(', ')})`).option('--subject <text>', 'Update subject').option('-d, --description <text>', 'Update description').option('--owner <agentId>', 'Set owner').option('--clear-owner', 'Clear owner').action(async (id: string, opts: {
 				list?: string;
 				status?: string;
 				subject?: string;

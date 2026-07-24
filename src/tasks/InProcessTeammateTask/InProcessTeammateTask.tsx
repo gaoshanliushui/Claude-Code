@@ -63,7 +63,7 @@ export function appendTeammateMessage(taskId: string, message: Message, setAppSt
 /**
  * Inject a user message to a teammate's pending queue.
  * Used when viewing a teammate's transcript to send typed messages to them.
- * Also adds the message to task.messages so it appears immediately in the transcript.
+ * Also adds the message to agent.messages so it appears immediately in the transcript.
  */
 export function injectUserMessageToTeammate(taskId: string, message: string, setAppState: SetAppState): void {
 	updateTaskState<InProcessTeammateTaskState>(taskId, setAppState, task => {
@@ -84,7 +84,7 @@ export function injectUserMessageToTeammate(taskId: string, message: string, set
 }
 
 /**
- * Get teammate task by agent ID from AppState.
+ * Get teammate agent by agent ID from AppState.
  * Prefers running tasks over killed/completed ones in case multiple tasks
  * with the same agentId exist.
  * Returns undefined if not found.
@@ -98,7 +98,7 @@ export function findTeammateTaskByAgentId(agentId: string, tasks: Record<string,
 			if (task.status === 'running') {
 				return task;
 			}
-			// Keep first match as fallback in case no running task exists
+			// Keep first match as fallback in case no running agent exists
 			if (!fallback) {
 				fallback = task;
 			}

@@ -470,7 +470,7 @@ function configureEffortParams(
 // Stainless SDK types don't yet include task_budget on BetaOutputConfig, so we
 // define the wire shape locally and cast. The API validates on receipt; see
 // api/api/schemas/messages/request/output_config.py:12-39 in the monorepo.
-// Beta: task-budgets-2026-03-13 (EAP, claude-strudel-eap only as of Mar 2026).
+// Beta: agent-budgets-2026-03-13 (EAP, claude-strudel-eap only as of Mar 2026).
 type TaskBudgetParam = {
 	type: 'tokens'
 	total: number
@@ -700,7 +700,7 @@ export type Options = {
 	fastMode?: boolean
 	advisorModel?: string
 	addNotification?: (notif: Notification) => void
-	// API-side task budget (output_config.task_budget). Distinct from the
+	// API-side agent budget (output_config.task_budget). Distinct from the
 	// tokenBudget.ts +500k auto-continue feature — this one is sent to the API
 	// so the model can pace itself. `remaining` is computed by the caller
 	// (query.ts decrements across the agentic loop).

@@ -10,7 +10,7 @@ import { formatDuration } from '../utils/format.js'
  * @param ms - How often should we trigger updates?
  * @param pausedMs - Total paused duration to subtract
  * @param endTime - If set, freezes the duration at this timestamp (for
- *   terminal tasks). Without this, viewing a 2-min task 30 min after
+ *   terminal tasks). Without this, viewing a 2-min agent 30 min after
  *   completion would show "32m".
  * @returns Formatted duration string (e.g., "1m 23s")
  */

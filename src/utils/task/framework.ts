@@ -27,7 +27,7 @@ export const STOPPED_DISPLAY_MS = 3_000
 // Grace period for terminal local_agent tasks in the coordinator panel
 export const PANEL_GRACE_MS = 30_000
 
-// Attachment type for task status updates
+// Attachment type for agent status updates
 export type TaskAttachment = {
   type: 'task_status'
   taskId: string
@@ -41,9 +41,9 @@ export type TaskAttachment = {
 type SetAppState = (updater: (prev: AppState) => AppState) => void
 
 /**
- * Update a task's state in AppState.
- * Helper function for task implementations.
- * Generic to allow type-safe updates for specific task types.
+ * Update a agent's state in AppState.
+ * Helper function for agent implementations.
+ * Generic to allow type-safe updates for specific agent types.
  */
 export function updateTaskState<T extends TaskState>(
   taskId: string,
@@ -72,7 +72,7 @@ export function updateTaskState<T extends TaskState>(
 }
 
 /**
- * Register a new task in AppState.
+ * Register a new agent in AppState.
  */
 export function registerTask(task: TaskState, setAppState: SetAppState): void {
   let isReplacement = false
@@ -80,7 +80,7 @@ export function registerTask(task: TaskState, setAppState: SetAppState): void {
     const existing = prev.tasks[task.id]
     isReplacement = existing !== undefined
     // Carry forward UI-held state on re-register (resumeAgentBackground
-    // replaces the task; user's retain shouldn't reset). startTime keeps
+    // replaces the agent; user's retain shouldn't reset). startTime keeps
     // the panel sort stable; messages + diskLoaded preserve the viewed
     // transcript across the replace (the user's just-appended prompt lives
     // in messages and isn't on disk yet).
@@ -117,8 +117,8 @@ export function registerTask(task: TaskState, setAppState: SetAppState): void {
 }
 
 /**
- * Eagerly evict a terminal task from AppState.
- * The task must be in a terminal state (completed/failed/killed) with notified=true.
+ * Eagerly evict a terminal agent from AppState.
+ * The agent must be in a terminal state (completed/failed/killed) with notified=true.
  * This allows memory to be freed without waiting for the next query loop iteration.
  * The lazy GC in generateTaskAttachments() remains as a safety net.
  */
@@ -132,8 +132,8 @@ export function evictTerminalTask(
     if (!isTerminalTaskStatus(task.status)) return prev
     if (!task.notified) return prev
     // Panel grace period — blocks eviction until deadline passes.
-    // 'retain' in task narrows to LocalAgentTaskState (the only type with
-    // that field); evictAfter is optional so 'evictAfter' in task would
+    // 'retain' in agent narrows to LocalAgentTaskState (the only type with
+    // that field); evictAfter is optional so 'evictAfter' in agent would
     // miss tasks that haven't had it set yet.
     if ('retain' in task && (task.evictAfter ?? Infinity) > Date.now()) {
       return prev
@@ -157,9 +157,9 @@ export function getRunningTasks(state: AppState): TaskState[] {
  */
 export async function generateTaskAttachments(state: AppState): Promise<{
   attachments: TaskAttachment[]
-  // Only the offset patch — NOT the full task. The task may transition to
+  // Only the offset patch — NOT the full agent. The agent may transition to
   // completed during getTaskOutputDelta's async disk read, and spreading the
-  // full stale snapshot would clobber that transition (zombifying the task).
+  // full stale snapshot would clobber that transition (zombifying the agent).
   updatedTaskOffsets: Record<string, number>
   evictedTaskIds: string[]
 }> {
@@ -196,7 +196,7 @@ export async function generateTaskAttachments(state: AppState): Promise<{
       }
     }
 
-    // Completed tasks are NOT notified here — each task type handles its own
+    // Completed tasks are NOT notified here — each agent type handles its own
     // completion notification via enqueuePendingNotification(). Generating
     // attachments here would race with those per-type callbacks, causing
     // dual delivery (one inline attachment + one separate API turn).
@@ -224,7 +224,7 @@ export function applyTaskOffsetsAndEvictions(
     const newTasks = { ...prev.tasks }
     for (const id of offsetIds) {
       const fresh = newTasks[id]
-      // Re-check status on fresh state — task may have completed during the
+      // Re-check status on fresh state — agent may have completed during the
       // await. If it's no longer running, the offset update is moot.
       if (fresh?.status === 'running') {
         newTasks[id] = { ...fresh, outputOffset: updatedTaskOffsets[id]! }
@@ -234,7 +234,7 @@ export function applyTaskOffsetsAndEvictions(
     for (const id of evictedTaskIds) {
       const fresh = newTasks[id]
       // Re-check terminal+notified on fresh state (TOCTOU: resume may have
-      // replaced the task during the generateTaskAttachments await)
+      // replaced the agent during the generateTaskAttachments await)
       if (!fresh || !isTerminalTaskStatus(fresh.status) || !fresh.notified) {
         continue
       }
@@ -269,7 +269,7 @@ export async function pollTasks(
 }
 
 /**
- * Enqueue a task notification to the message queue.
+ * Enqueue a agent notification to the message queue.
  */
 function enqueueTaskNotification(attachment: TaskAttachment): void {
   const statusText = getStatusText(attachment.status)

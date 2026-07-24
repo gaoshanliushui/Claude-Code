@@ -9,7 +9,7 @@ import { OffscreenFreeze } from './OffscreenFreeze.js';
 
 /**
  * Header shown when viewing a teammate's transcript.
- * Displays teammate name (colored), task description, and exit hint.
+ * Displays teammate name (colored), agent description, and exit hint.
  */
 export function TeammateViewHeader() {
   const $ = _c(14);

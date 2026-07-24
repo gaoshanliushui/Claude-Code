@@ -103,7 +103,7 @@ export class InProcessBackend implements TeammateExecutor {
 			result.abortController
 		) {
 			// Start the agent loop in the background (fire-and-forget)
-			// The prompt is passed through the task state and config
+			// The prompt is passed through the agent state and config
 			startInProcessTeammate({
 				identity: {
 					agentId: result.agentId,
@@ -201,7 +201,7 @@ export class InProcessBackend implements TeammateExecutor {
 			return false
 		}
 
-		// Get current AppState to find the task
+		// Get current AppState to find the agent
 		const state = this.context.getAppState()
 		const task = findTeammateTaskByAgentId(agentId, state.tasks)
 
@@ -242,7 +242,7 @@ export class InProcessBackend implements TeammateExecutor {
 			task.identity.teamName,
 		)
 
-		// Mark the task as shutdown requested
+		// Mark the agent as shutdown requested
 		requestTeammateShutdown(task.id, this.context.setAppState)
 
 		logForDebugging(
@@ -256,7 +256,7 @@ export class InProcessBackend implements TeammateExecutor {
 	 * Force kills an in-process teammate immediately.
 	 *
 	 * Uses the teammate's AbortController to cancel all async operations
-	 * and updates the task state to 'killed'.
+	 * and updates the agent state to 'killed'.
 	 */
 	async kill(agentId: string): Promise<boolean> {
 		logForDebugging(`[InProcessBackend] kill() called for ${agentId}`)
@@ -268,7 +268,7 @@ export class InProcessBackend implements TeammateExecutor {
 			return false
 		}
 
-		// Get current AppState to find the task
+		// Get current AppState to find the agent
 		const state = this.context.getAppState()
 		const task = findTeammateTaskByAgentId(agentId, state.tasks)
 
@@ -305,7 +305,7 @@ export class InProcessBackend implements TeammateExecutor {
 			return false
 		}
 
-		// Get current AppState to find the task
+		// Get current AppState to find the agent
 		const state = this.context.getAppState()
 		const task = findTeammateTaskByAgentId(agentId, state.tasks)
 
@@ -316,7 +316,7 @@ export class InProcessBackend implements TeammateExecutor {
 			return false
 		}
 
-		// Check if task is running and not aborted
+		// Check if agent is running and not aborted
 		const isRunning = task.status === 'running'
 		const isAborted = task.abortController?.signal.aborted ?? true
 

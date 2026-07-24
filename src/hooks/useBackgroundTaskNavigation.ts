@@ -131,7 +131,7 @@ export function useBackgroundTaskNavigation(options?: {
     })
   }, [teammateCount, setAppState])
 
-  // Get the selected teammate's task info
+  // Get the selected teammate's agent info
   const getSelectedTeammate = (): {
     taskId: string
     task: InProcessTeammateTaskState
@@ -159,7 +159,7 @@ export function useBackgroundTaskNavigation(options?: {
           return
         }
       }
-      // Teammate is not running or task doesn't exist — exit the view
+      // Teammate is not running or agent doesn't exist — exit the view
       exitTeammateView(setAppState)
       return
     }

@@ -31,7 +31,7 @@ const inputSchema = lazySchema(() =>
     status: z
       .enum(['normal', 'proactive'])
       .describe(
-        "Use 'proactive' when you're surfacing something the user hasn't asked for and needs to see now — task completion while they're away, a blocker you hit, an unsolicited status update. Use 'normal' when replying to something the user just said.",
+        "Use 'proactive' when you're surfacing something the user hasn't asked for and needs to see now — agent completion while they're away, a blocker you hit, an unsolicited status update. Use 'normal' when replying to something the user just said.",
       ),
   }),
 )

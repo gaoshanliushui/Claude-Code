@@ -26,11 +26,11 @@ function isIdleNotification(value: string): boolean {
   }
 }
 
-// Maximum number of task notification lines to show
+// Maximum number of agent notification lines to show
 const MAX_VISIBLE_NOTIFICATIONS = 3;
 
 /**
- * Create a synthetic overflow notification message for capped task notifications.
+ * Create a synthetic overflow notification message for capped agent notifications.
  */
 function createOverflowNotificationMessage(count: number): string {
   return `<${TASK_NOTIFICATION_TAG}>
@@ -40,7 +40,7 @@ function createOverflowNotificationMessage(count: number): string {
 }
 
 /**
- * Process queued commands to cap task notifications at MAX_VISIBLE_NOTIFICATIONS lines.
+ * Process queued commands to cap agent notifications at MAX_VISIBLE_NOTIFICATIONS lines.
  * Other command types are always shown in full.
  * Idle notifications are filtered out entirely.
  */
@@ -48,7 +48,7 @@ function processQueuedCommands(queuedCommands: QueuedCommand[]): QueuedCommand[]
   // Filter out idle notifications - they are processed silently
   const filteredCommands = queuedCommands.filter(cmd => typeof cmd.value !== 'string' || !isIdleNotification(cmd.value));
 
-  // Separate task notifications from other commands
+  // Separate agent notifications from other commands
   const taskNotifications = filteredCommands.filter(cmd => cmd.mode === 'task-notification');
   const otherCommands = filteredCommands.filter(cmd => cmd.mode !== 'task-notification');
 
@@ -83,7 +83,7 @@ function PromptInputQueuedCommandsImpl(): React.ReactNode {
   // re-renders defeat Message's areMessagePropsEqual (compares uuid) → flicker.
   const messages = useMemo(() => {
     if (queuedCommands.length === 0) return null;
-    // task-notification is shown via useInboxNotification; most isMeta commands
+    // agent-notification is shown via useInboxNotification; most isMeta commands
     // (scheduled tasks, proactive ticks) are system-generated and hidden.
     // Channel messages are the exception — isMeta but shown so the keyboard
     // user sees what arrived.

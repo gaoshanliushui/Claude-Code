@@ -12,7 +12,7 @@ const inputSchema = lazySchema(() =>
 		task_id: z
 			.string()
 			.optional()
-			.describe('The ID of the background task to stop'),
+			.describe('The ID of the background agent to stop'),
 		// shell_id is accepted for backward compatibility with the deprecated KillShell tool
 		shell_id: z.string().optional().describe('Deprecated: use task_id instead'),
 	}),
@@ -22,14 +22,14 @@ type InputSchema = ReturnType<typeof inputSchema>
 const outputSchema = lazySchema(() =>
 	z.object({
 		message: z.string().describe('Status message about the operation'),
-		task_id: z.string().describe('The ID of the task that was stopped'),
-		task_type: z.string().describe('The type of the task that was stopped'),
+		task_id: z.string().describe('The ID of the agent that was stopped'),
+		task_type: z.string().describe('The type of the agent that was stopped'),
 		// Optional: tool outputs are persisted to transcripts and replayed on --resume
 		// without re-validation, so sessions from before this field was added lack it.
 		command: z
 			.string()
 			.optional()
-			.describe('The command or description of the stopped task'),
+			.describe('The command or description of the stopped agent'),
 	}),
 )
 type OutputSchema = ReturnType<typeof outputSchema>
@@ -38,7 +38,7 @@ export type Output = z.infer<OutputSchema>
 
 export const TaskStopTool = buildTool({
 	name: TASK_STOP_TOOL_NAME,
-	searchHint: 'kill a running background task',
+	searchHint: 'kill a running background agent',
 	// KillShell is the deprecated name - kept as alias for backward compatibility
 	// with existing transcripts and SDK users
 	aliases: ['KillShell'],

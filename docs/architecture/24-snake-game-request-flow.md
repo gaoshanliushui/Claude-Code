@@ -965,8 +965,8 @@ T=145s  queryLoop 终止
 
 - [`docs/09-query.md`](../09-query.md)：queryLoop 完整拆解
 - [`docs/11-tool-execution.md`](../tool/11-tool-execution.md)：工具执行路径
-- [`docs/12-run-agent.md`](../task/12-run-agent.md)：Subagent 派生与 fork
+- [`docs/12-run-agent.md`](../agent/12-run-agent.md)：Subagent 派生与 fork
 - [`docs/14-tool-hooks.md`](../tool/14-tool-hooks.md) + [`docs/15-utils-hooks.md`](../hook/15-utils-hooks.md)：Hook 系统
-- [`docs/18-task-planning.md`](../task/18-task-planning.md)：TodoWrite 与 TaskCreate
+- [`docs/18-task-planning.md`](../agent/18-task-planning.md)：TodoWrite 与 TaskCreate
 - [`docs/20-request-flow.md`](20-request-flow.md)：请求流转
 - [`docs/23-design-and-core-modules.md`](23-design-and-core-modules.md)：设计原理与核心模块（含 readme.txt 偏差澄清）

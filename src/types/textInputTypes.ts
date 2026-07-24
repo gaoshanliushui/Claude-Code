@@ -351,7 +351,7 @@ export type QueuedCommand = {
    * Agent that should receive this notification. Undefined = main thread.
    * Subagents run in-process and share the module-level command queue; the
    * drain gate in query.ts filters by this field so a subagent's background
-   * task notifications don't leak into the coordinator's context (PR #18453
+   * agent notifications don't leak into the coordinator's context (PR #18453
    * unified the queue but lost the isolation the dual-queue accidentally had).
    */
   agentId?: AgentId

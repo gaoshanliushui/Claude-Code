@@ -12,7 +12,7 @@ import {DESCRIPTION, PROMPT} from './prompt.js'
 
 const inputSchema = lazySchema(() =>
 	z.strictObject({
-		taskId: z.string().describe('The ID of the task to retrieve'),
+		taskId: z.string().describe('The ID of the agent to retrieve'),
 	}),
 )
 type InputSchema = ReturnType<typeof inputSchema>
@@ -37,7 +37,7 @@ export type Output = z.infer<OutputSchema>
 
 export const TaskGetTool = buildTool({
 	name: TASK_GET_TOOL_NAME,
-	searchHint: 'retrieve a task by ID',
+	searchHint: 'retrieve a agent by ID',
 	maxResultSizeChars: 100_000,
 	async description() {
 		return DESCRIPTION

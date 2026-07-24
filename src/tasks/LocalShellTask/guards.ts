@@ -21,9 +21,9 @@ export type LocalShellTaskState = TaskStateBase & {
 	cleanupTimeoutId?: NodeJS.Timeout
 	// Track what we last reported for computing deltas (total lines from TaskOutput)
 	lastReportedTotalLines: number
-	// Whether the task has been backgrounded (false = foreground running, true = backgrounded)
+	// Whether the agent has been backgrounded (false = foreground running, true = backgrounded)
 	isBackgrounded: boolean
-	// Agent that spawned this task. Used to kill orphaned bash tasks when the
+	// Agent that spawned this agent. Used to kill orphaned bash tasks when the
 	// agent exits (see killShellTasksForAgent). Undefined = main thread.
 	agentId?: AgentId
 	// UI display variant. 'monitor' → shows description instead of command,

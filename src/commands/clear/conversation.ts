@@ -85,9 +85,9 @@ export async function clearConversation({
   }
 
   // Compute preserved tasks up front so their per-agent state survives the
-  // cache wipe below. A task is preserved unless it explicitly has
+  // cache wipe below. A agent is preserved unless it explicitly has
   // isBackgrounded === false. Main-session tasks (Ctrl+B) are preserved —
-  // they write to an isolated per-task transcript and run under an agent
+  // they write to an isolated per-agent transcript and run under an agent
   // context, so they're safe across session ID regeneration. See
   // LocalMainSessionTask.ts startBackgroundSession.
   const preservedAgentIds = new Set<string>()
@@ -142,7 +142,7 @@ export async function clearConversation({
           nextTasks[taskId] = task
           continue
         }
-        // Foreground task: kill it and drop from state
+        // Foreground agent: kill it and drop from state
         try {
           if (task.status === 'running') {
             if (isLocalShellTask(task)) {

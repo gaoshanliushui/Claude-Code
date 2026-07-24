@@ -14,7 +14,7 @@ import { readFileRange, tailFile } from '../fsOperations.js'
 import { logError } from '../log.js'
 import { getProjectTempDir } from '../permissions/filesystem.js'
 
-// SECURITY: O_NOFOLLOW prevents following symlinks when opening task output files.
+// SECURITY: O_NOFOLLOW prevents following symlinks when opening agent output files.
 // Without this, an attacker in the sandbox could create symlinks in the tasks directory
 // pointing to arbitrary files, causing Claude Code on the host to write to those files.
 // O_NOFOLLOW is not available on Windows, but the sandbox attack vector is Unix-only.
@@ -23,7 +23,7 @@ const O_NOFOLLOW = fsConstants.O_NOFOLLOW ?? 0
 const DEFAULT_MAX_READ_BYTES = 8 * 1024 * 1024 // 8MB
 
 /**
- * Disk cap for task output files. In file mode (bash), a watchdog polls
+ * Disk cap for agent output files. In file mode (bash), a watchdog polls
  * file size and kills the process. In pipe mode (hooks), DiskTaskOutput
  * drops chunks past this limit. Shared so both caps stay in sync.
  */
@@ -31,7 +31,7 @@ export const MAX_TASK_OUTPUT_BYTES = 5 * 1024 * 1024 * 1024
 export const MAX_TASK_OUTPUT_BYTES_DISPLAY = '5GB'
 
 /**
- * Get the task output directory for this session.
+ * Get the agent output directory for this session.
  * Uses project temp directory so reads are auto-allowed by checkReadableInternalPath.
  *
  * The session ID is included so concurrent sessions in the same project don't
@@ -60,14 +60,14 @@ export function _resetTaskOutputDirForTest(): void {
 }
 
 /**
- * Ensure the task output directory exists
+ * Ensure the agent output directory exists
  */
 async function ensureOutputDir(): Promise<void> {
   await mkdir(getTaskOutputDir(), { recursive: true })
 }
 
 /**
- * Get the output file path for a task
+ * Get the output file path for a agent
  */
 export function getTaskOutputPath(taskId: string): string {
   return join(getTaskOutputDir(), `${taskId}.output`)
@@ -87,7 +87,7 @@ function track<T>(p: Promise<T>): Promise<T> {
 }
 
 /**
- * Encapsulates async disk writes for a single task's output.
+ * Encapsulates async disk writes for a single agent's output.
  *
  * Uses a flat array as a write queue processed by a single drain loop,
  * so each chunk can be GC'd immediately after its write completes.
@@ -234,7 +234,7 @@ const outputs = new Map<string, DiskTaskOutput>()
 
 /**
  * Test helper — cancel pending writes, await in-flight ops, clear the map.
- * backgroundShells.test.ts and other task tests spawn real shells that
+ * backgroundShells.test.ts and other agent tests spawn real shells that
  * write through this module without afterEach cleanup; their entries
  * leak into diskOutput.test.ts on the same shard.
  *
@@ -262,7 +262,7 @@ function getOrCreateOutput(taskId: string): DiskTaskOutput {
 }
 
 /**
- * Append output to a task's disk file asynchronously.
+ * Append output to a agent's disk file asynchronously.
  * Creates the file if it doesn't exist.
  */
 export function appendTaskOutput(taskId: string, content: string): void {
@@ -270,7 +270,7 @@ export function appendTaskOutput(taskId: string, content: string): void {
 }
 
 /**
- * Wait for all pending writes for a task to complete.
+ * Wait for all pending writes for a agent to complete.
  * Useful before reading output to ensure all data is flushed.
  */
 export async function flushTaskOutput(taskId: string): Promise<void> {
@@ -281,9 +281,9 @@ export async function flushTaskOutput(taskId: string): Promise<void> {
 }
 
 /**
- * Evict a task's DiskTaskOutput from the in-memory map after flushing.
+ * Evict a agent's DiskTaskOutput from the in-memory map after flushing.
  * Unlike cleanupTaskOutput, this does not delete the output file on disk.
- * Call this when a task completes and its output has been consumed.
+ * Call this when a agent completes and its output has been consumed.
  */
 export function evictTaskOutput(taskId: string): Promise<void> {
   return track(
@@ -330,7 +330,7 @@ export async function getTaskOutputDelta(
 }
 
 /**
- * Get output for a task, reading the tail of the file.
+ * Get output for a agent, reading the tail of the file.
  * Caps at maxBytes to avoid loading multi-GB files into memory.
  */
 export async function getTaskOutput(
@@ -357,7 +357,7 @@ export async function getTaskOutput(
 }
 
 /**
- * Get the current size (offset) of a task's output file.
+ * Get the current size (offset) of a agent's output file.
  */
 export async function getTaskOutputSize(taskId: string): Promise<number> {
   try {
@@ -373,7 +373,7 @@ export async function getTaskOutputSize(taskId: string): Promise<number> {
 }
 
 /**
- * Clean up a task's output file and write queue.
+ * Clean up a agent's output file and write queue.
  */
 export async function cleanupTaskOutput(taskId: string): Promise<void> {
   const output = outputs.get(taskId)
@@ -394,7 +394,7 @@ export async function cleanupTaskOutput(taskId: string): Promise<void> {
 }
 
 /**
- * Initialize output file for a new task.
+ * Initialize output file for a new agent.
  * Creates an empty file to ensure the path exists.
  */
 export function initTaskOutput(taskId: string): Promise<string> {

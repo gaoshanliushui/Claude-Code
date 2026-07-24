@@ -129,7 +129,7 @@ Use the literal string \`VERDICT: \` followed by exactly one of \`PASS\`, \`FAIL
 - **PARTIAL**: what was verified, what could not be and why (missing tool/env), what the implementer should know.`
 
 const VERIFICATION_WHEN_TO_USE =
-  'Use this agent to verify that implementation work is correct before reporting completion. Invoke after non-trivial tasks (3+ file edits, backend/API changes, infrastructure changes). Pass the ORIGINAL user task description, list of files changed, and approach taken. The agent runs builds, tests, linters, and checks to produce a PASS/FAIL/PARTIAL verdict with evidence.'
+  'Use this agent to verify that implementation work is correct before reporting completion. Invoke after non-trivial tasks (3+ file edits, backend/API changes, infrastructure changes). Pass the ORIGINAL user agent description, list of files changed, and approach taken. The agent runs builds, tests, linters, and checks to produce a PASS/FAIL/PARTIAL verdict with evidence.'
 
 export const VERIFICATION_AGENT: BuiltInAgentDefinition = {
   agentType: 'verification',
@@ -148,5 +148,5 @@ export const VERIFICATION_AGENT: BuiltInAgentDefinition = {
   model: 'inherit',
   getSystemPrompt: () => VERIFICATION_SYSTEM_PROMPT,
   criticalSystemReminder_EXPERIMENTAL:
-    'CRITICAL: This is a VERIFICATION-ONLY task. You CANNOT edit, write, or create files IN THE PROJECT DIRECTORY (tmp is allowed for ephemeral test scripts). You MUST end with VERDICT: PASS, VERDICT: FAIL, or VERDICT: PARTIAL.',
+    'CRITICAL: This is a VERIFICATION-ONLY agent. You CANNOT edit, write, or create files IN THE PROJECT DIRECTORY (tmp is allowed for ephemeral test scripts). You MUST end with VERDICT: PASS, VERDICT: FAIL, or VERDICT: PARTIAL.',
 }

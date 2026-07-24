@@ -1,4 +1,4 @@
-export const DESCRIPTION = 'Get a task by ID from the task list'
+export const DESCRIPTION = 'Get a agent by ID from the agent list'
 
 export const PROMPT = `Use this tool to retrieve a task by its ID from the task list.
 

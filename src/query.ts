@@ -191,7 +191,7 @@ export type QueryParams = {
 	maxOutputTokensOverride?: number
 	maxTurns?: number
 	skipCacheWrite?: boolean
-	// API task_budget (output_config.task_budget, beta task-budgets-2026-03-13).
+	// API task_budget (output_config.task_budget, beta agent-budgets-2026-03-13).
 	// Distinct from the tokenBudget +500k auto-continue feature. `total` is the
 	// budget for the whole agentic turn; `remaining` is computed per iteration
 	// from cumulative API usage. See configureTaskBudgetParams in claude.ts.
@@ -1562,9 +1562,9 @@ async function* queryLoop(
 		// These will be sent as attachments so Claude can respond to them in the current turn.
 		//
 		// Drain pending notifications. LocalShellTask completions are 'next'
-		// (when MONITOR_TOOL is on) and drain without Sleep. Other task types
+		// (when MONITOR_TOOL is on) and drain without Sleep. Other agent types
 		// (agent/workflow/framework) still default to 'later' — the Sleep flush
-		// covers those. If all task types move to 'next', this branch could go.
+		// covers those. If all agent types move to 'next', this branch could go.
 		//
 		// Slash commands are excluded from mid-turn drain — they must go through
 		// processSlashCommand after the turn ends (via useQueueProcessor), not be
@@ -1586,7 +1586,7 @@ async function* queryLoop(
 		).filter(cmd => {
 			if (isSlashCommand(cmd)) return false
 			if (isMainThread) return cmd.agentId === undefined
-			// Subagents only drain task-notifications addressed to them — never
+			// Subagents only drain agent-notifications addressed to them — never
 			// user prompts, even if someone stamps an agentId on one.
 			return cmd.mode === 'task-notification' && cmd.agentId === currentAgentId
 		})
@@ -1642,7 +1642,7 @@ async function* queryLoop(
 		}
 
 		// Remove only commands that were actually consumed as attachments.
-		// Prompt and task-notification commands are converted to attachments above.
+		// Prompt and agent-notification commands are converted to attachments above.
 		const consumedCommands = queuedCommandsSnapshot.filter(
 			cmd => cmd.mode === 'prompt' || cmd.mode === 'task-notification',
 		)
@@ -1692,7 +1692,7 @@ async function* queryLoop(
 		// Each time we have tool results and are about to recurse, that's a turn
 		const nextTurnCount = turnCount + 1
 
-		// Periodic task summary for `claude ps` — fires mid-turn so a
+		// Periodic agent summary for `claude ps` — fires mid-turn so a
 		// long-running agent still refreshes what it's working on. Gated
 		// only on !agentId so every top-level conversation (REPL, SDK, HFI,
 		// remote) generates summaries; subagents/forks don't.

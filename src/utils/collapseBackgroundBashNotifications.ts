@@ -31,7 +31,7 @@ function isCompletedBackgroundBash(
 }
 
 /**
- * Collapses consecutive completed-background-bash task-notifications into a
+ * Collapses consecutive completed-background-bash agent-notifications into a
  * single synthetic "N background commands completed" notification. Failed/killed
  * tasks and agent/workflow notifications are left alone. Monitor stream
  * events (enqueueStreamEvent) have no <status> tag and never match.
@@ -59,7 +59,7 @@ export function collapseBackgroundBashNotifications(
       if (count === 1) {
         result.push(msg)
       } else {
-        // Synthesize a task-notification that UserAgentNotificationMessage
+        // Synthesize a agent-notification that UserAgentNotificationMessage
         // already knows how to render — no new renderer needed.
         result.push({
           ...msg,

@@ -167,8 +167,8 @@ async function executeForkedSlashCommand(command: CommandBase & PromptCommand, a
 			// Wait for MCP servers to settle. Scheduled tasks fire at startup and
 			// all N drain within ~1ms (since we return immediately), capturing
 			// context.options.tools before MCP connects. The sync path
-			// accidentally avoided this — tasks serialized, so task N's drain
-			// happened after task N-1's 30s run, by which time MCP was up.
+			// accidentally avoided this — tasks serialized, so agent N's drain
+			// happened after agent N-1's 30s run, by which time MCP was up.
 			// Poll until no 'pending' clients remain, then refresh.
 			const deadline = Date.now() + MCP_SETTLE_TIMEOUT_MS;
 			while (Date.now() < deadline) {

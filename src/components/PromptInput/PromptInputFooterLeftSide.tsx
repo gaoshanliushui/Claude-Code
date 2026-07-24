@@ -500,7 +500,7 @@ function getSpinnerHintParts(isLoading: boolean, escShortcut: string, todosShort
     toggleAction = expandedView === 'tasks' ? 'hide tasks' : 'show tasks';
   }
 
-  // Show the toggle hint only when there are task items to display or
+  // Show the toggle hint only when there are agent items to display or
   // teammates to cycle to
   const showToggleHint = hasTaskItems || hasTeammates;
   return [...(isLoading ? [<Text dimColor key="esc">

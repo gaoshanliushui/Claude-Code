@@ -243,7 +243,7 @@ async function getOrCreateWorktree(
 	// Fast resume path: if the worktree already exists skip fetch and creation.
 	// Read the .git pointer file directly (no subprocess, no upward walk) — a
 	// subprocess `rev-parse HEAD` burns ~15ms on spawn overhead even for a 2ms
-	// task, and the await yield lets background spawnSyncs pile on (seen at 55ms).
+	// agent, and the await yield lets background spawnSyncs pile on (seen at 55ms).
 	const existingHead = await readWorktreeHeadSha(worktreePath)
 	if (existingHead) {
 		return {
@@ -1340,7 +1340,7 @@ export async function execIntoTmuxWorktree(args: string[]): Promise<{
 	}
 
 	// Check if tmux prefix conflicts with Claude keybindings
-	// Claude binds: ctrl+b (task:background), ctrl+c, ctrl+d, ctrl+t, ctrl+o, ctrl+r, ctrl+s, ctrl+g, ctrl+e
+	// Claude binds: ctrl+b (agent:background), ctrl+c, ctrl+d, ctrl+t, ctrl+o, ctrl+r, ctrl+s, ctrl+g, ctrl+e
 	const claudeBindings = [
 		'C-b',
 		'C-c',

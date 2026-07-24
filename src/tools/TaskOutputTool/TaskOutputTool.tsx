@@ -29,14 +29,14 @@ import BashToolResultMessage from '../BashTool/BashToolResultMessage.js';
 import {TASK_OUTPUT_TOOL_NAME} from './constants.js';
 
 const inputSchema = lazySchema(() => z.strictObject({
-	task_id: z.string().describe('The task ID to get output from'),
+	task_id: z.string().describe('The agent ID to get output from'),
 	block: semanticBoolean(z.boolean().default(true)).describe('Whether to wait for completion'),
 	timeout: z.number().min(0).max(600000).default(30000).describe('Max wait time in ms')
 }));
 type InputSchema = ReturnType<typeof inputSchema>;
 type TaskOutputToolInput = z.infer<InputSchema>;
 
-// Unified output type covering all task types
+// Unified output type covering all agent types
 type TaskOutput = {
 	task_id: string;
 	task_type: TaskType;
@@ -57,7 +57,7 @@ type TaskOutputToolOutput = {
 // Re-export Progress from centralized types to break import cycles
 export type {TaskOutputProgress as Progress} from '../../types/tools.js';
 
-// Get output for any task type
+// Get output for any agent type
 async function getTaskOutputData(task: TaskState): Promise<TaskOutput> {
 	let output: string;
 	if (task.type === 'local_bash') {
@@ -115,7 +115,7 @@ async function getTaskOutputData(task: TaskState): Promise<TaskOutput> {
 	return baseOutput;
 }
 
-// Wait for task to complete
+// Wait for agent to complete
 async function waitForTaskCompletion(taskId: string, getAppState: () => {
 	tasks?: Record<string, TaskState>;
 }, timeoutMs: number, abortController?: AbortController): Promise<TaskState | null> {
@@ -145,7 +145,7 @@ async function waitForTaskCompletion(taskId: string, getAppState: () => {
 
 export const TaskOutputTool: Tool<InputSchema, TaskOutputToolOutput> = buildTool({
 	name: TASK_OUTPUT_TOOL_NAME,
-	searchHint: 'read output/logs from a background task',
+	searchHint: 'read output/logs from a background agent',
 	maxResultSizeChars: 100_000,
 	shouldDefer: true,
 	// Backwards-compatible aliases for renamed tools
@@ -157,7 +157,7 @@ export const TaskOutputTool: Tool<InputSchema, TaskOutputToolOutput> = buildTool
 		return inputSchema();
 	},
 	async description() {
-		return '[Deprecated] — prefer Read on the task output file path';
+		return '[Deprecated] — prefer Read on the agent output file path';
 	},
 	isConcurrencySafe(_input) {
 		return this.isReadOnly?.(_input) ?? false;

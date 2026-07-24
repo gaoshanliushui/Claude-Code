@@ -117,7 +117,7 @@ export function extractLastJsonStringField(
 /**
  * Pattern matching auto-generated or system messages that should be skipped
  * when looking for the first meaningful user prompt. Matches anything that
- * starts with a lowercase XML-like tag (IDE context, hook output, task
+ * starts with a lowercase XML-like tag (IDE context, hook output, agent
  * notifications, channel messages, etc.) or a synthetic interrupt marker.
  */
 const SKIP_FIRST_PROMPT_PATTERN =

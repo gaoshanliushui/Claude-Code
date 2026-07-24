@@ -107,7 +107,7 @@ export function TeammateSpinnerLine({
   const idleElapsedTime = useElapsedTime(idleStartRef.current ?? Date.now(), teammate.isIdle && !allIdle);
 
   // Freeze the duration when we first detect all idle
-  // Use the teammate's actual work time (since task started) for the past-tense display
+  // Use the teammate's actual work time (since agent started) for the past-tense display
   if (allIdle && frozenDurationRef.current === null) {
     frozenDurationRef.current = formatDuration(Math.max(0, Date.now() - teammate.startTime - (teammate.totalPausedMs ?? 0)));
   }

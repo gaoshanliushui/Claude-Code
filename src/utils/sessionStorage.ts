@@ -114,7 +114,7 @@ type Transcript = (
 /**
  * Pre-compiled regex to skip non-meaningful messages when extracting first prompt.
  * Matches anything starting with a lowercase XML-like tag (IDE context, hook
- * output, task notifications, channel messages, etc.) or a synthetic interrupt
+ * output, agent notifications, channel messages, etc.) or a synthetic interrupt
  * marker. Kept in sync with sessionStoragePortable.ts — generic pattern avoids
  * an ever-growing allowlist that falls behind as new notification types ship.
  */
@@ -266,7 +266,7 @@ export type AgentMetadata = {
 	agentType: string
 	/** Worktree path if the agent was spawned with isolation: "worktree" */
 	worktreePath?: string
-	/** Original task description from the AgentTool input. Persisted so a
+	/** Original agent description from the AgentTool input. Persisted so a
 	 * resumed agent's notification can show the original description instead
 	 * of a placeholder. Optional — older metadata files lack this field. */
 	description?: string
@@ -330,8 +330,8 @@ function getRemoteAgentMetadataPath(taskId: string): string {
 }
 
 /**
- * Persist metadata for a remote-agent task so it can be restored on session
- * resume. Per-task sidecar file (sibling dir to subagents/) survives
+ * Persist metadata for a remote-agent agent so it can be restored on session
+ * resume. Per-agent sidecar file (sibling dir to subagents/) survives
  * hydrateSessionFromRemote's .jsonl wipe; status is always fetched fresh
  * from CCR on restore — only identity is persisted locally.
  */
@@ -1169,7 +1169,7 @@ class Project {
 			void this.enqueueWrite(sessionFile, entry)
 		} else if (entry.type === 'last-prompt') {
 			void this.enqueueWrite(sessionFile, entry)
-		} else if (entry.type === 'task-summary') {
+		} else if (entry.type === 'agent-summary') {
 			void this.enqueueWrite(sessionFile, entry)
 		} else if (entry.type === 'tag') {
 			// Tags can always be appended
@@ -1804,7 +1804,7 @@ export function getFirstMeaningfulUserMessageTextContent<T extends Message>(
 			}
 
 			// Skip non-meaningful messages (local command output, hook output,
-			// autonomous tick prompts, task notifications, pure IDE metadata tags)
+			// autonomous tick prompts, agent notifications, pure IDE metadata tags)
 			if (SKIP_FIRST_PROMPT_PATTERN.test(textContent)) {
 				continue
 			}
@@ -2679,14 +2679,14 @@ export function saveAiGeneratedTitle(sessionId: UUID, aiTitle: string): void {
 }
 
 /**
- * Append a periodic task summary for `claude ps`. Unlike ai-title this is
+ * Append a periodic agent summary for `claude ps`. Unlike ai-title this is
  * not re-appended by reAppendSessionMetadata — it's a rolling snapshot of
  * what the agent is doing *now*, so staleness is fine; ps reads the most
  * recent one from the tail.
  */
 export function saveTaskSummary(sessionId: UUID, summary: string): void {
 	appendEntryToFile(getTranscriptPathForSession(sessionId), {
-		type: 'task-summary',
+		type: 'agent-summary',
 		summary,
 		sessionId,
 		timestamp: new Date().toISOString(),
@@ -4270,7 +4270,7 @@ export function extractAgentIdsFromMessages(messages: Message[]): string[] {
 
 /**
  * Extract teammate transcripts directly from AppState tasks.
- * In-process teammates store their messages in task.messages,
+ * In-process teammates store their messages in agent.messages,
  * which is more reliable than loading from disk since each teammate turn
  * uses a random agentId for transcript storage.
  */
@@ -4327,7 +4327,7 @@ export async function loadSubagentTranscripts(
 	return transcripts
 }
 
-// Globs the session's subagents dir directly — unlike AppState.tasks, this survives task eviction.
+// Globs the session's subagents dir directly — unlike AppState.tasks, this survives agent eviction.
 export async function loadAllSubagentTranscriptsFromDisk(): Promise<{
 	[agentId: string]: Message[]
 }> {

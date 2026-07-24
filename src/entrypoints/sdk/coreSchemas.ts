@@ -1157,7 +1157,7 @@ export const AgentDefinitionSchema = lazySchema(() =>
         .boolean()
         .optional()
         .describe(
-          'Run this agent as a background task (non-blocking, fire-and-forget) when invoked',
+          'Run this agent as a background agent (non-blocking, fire-and-forget) when invoked',
         ),
       memory: z
         .enum(['user', 'project', 'local'])

@@ -77,7 +77,7 @@ const TOOL_VERBS: Record<string, string> = {
   Grep: 'Searching',
   WebFetch: 'Fetching',
   WebSearch: 'Searching',
-  Task: 'Running task',
+  Task: 'Running agent',
   FileReadTool: 'Reading',
   FileWriteTool: 'Writing',
   FileEditTool: 'Editing',

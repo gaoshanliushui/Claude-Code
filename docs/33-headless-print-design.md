@@ -87,7 +87,7 @@ Headless 模式通过命令队列管理所有待处理的命令：
 
 ```ts
 type QueuedCommand = {
-  mode: 'prompt' | 'orphaned-permission' | 'task-notification'
+  mode: 'prompt' | 'orphaned-permission' | 'agent-notification'
   value: string | ContentBlockParam[]
   uuid?: UUID
   priority?: 'now' | 'next' | 'later'

@@ -69,7 +69,7 @@ TaskOutputTool 是**唯一**允许模型读取后台任务（`local_bash` / `loc
 
 ```ts
 async description() {
-  return '[Deprecated] — prefer Read on the task output file path'
+  return '[Deprecated] — prefer Read on the agent output file path'
 },
 async prompt() {
   return `DEPRECATED: Prefer using the Read tool on the task's output file path instead. ...`
@@ -88,7 +88,7 @@ isEnabled() {
 ```ts
 // TaskOutputTool.tsx:31-36
 const inputSchema = lazySchema(() => z.strictObject({
-    task_id: z.string().describe('The task ID to get output from'),
+    task_id: z.string().describe('The agent ID to get output from'),
     block: semanticBoolean(z.boolean().default(true)).describe('Whether to wait for completion'),
     timeout: z.number().min(0).max(600000).default(30000).describe('Max wait time in ms')
 }));
@@ -312,10 +312,10 @@ TaskCreateTool 是 V2 任务清单系统的**创建**入口（替代 TodoWriteTo
 // TaskCreateTool.ts:18-33
 const inputSchema = lazySchema(() =>
   z.strictObject({
-    subject: z.string().describe('A brief title for the task'),
+    subject: z.string().describe('A brief title for the agent'),
     description: z.string().describe('What needs to be done'),
     activeForm: z.string().optional().describe('Present continuous form shown in spinner when in_progress'),
-    metadata: z.record(z.string(), z.unknown()).optional().describe('Arbitrary metadata to attach to the task'),
+    metadata: z.record(z.string(), z.unknown()).optional().describe('Arbitrary metadata to attach to the agent'),
   }),
 )
 ```
@@ -410,13 +410,13 @@ const inputSchema = lazySchema(() => {
   const TaskUpdateStatusSchema = TaskStatusSchema().or(z.literal('deleted'))
 
   return z.strictObject({
-    taskId: z.string().describe('The ID of the task to update'),
+    taskId: z.string().describe('The ID of the agent to update'),
     subject: z.string().optional(),
     description: z.string().optional(),
     activeForm: z.string().optional(),
     status: TaskUpdateStatusSchema.optional(),  // 多了 'deleted' 字面量
-    addBlocks: z.array(z.string()).optional().describe('Task IDs that this task blocks'),
-    addBlockedBy: z.array(z.string()).optional().describe('Task IDs that block this task'),
+    addBlocks: z.array(z.string()).optional().describe('Task IDs that this agent blocks'),
+    addBlockedBy: z.array(z.string()).optional().describe('Task IDs that block this agent'),
     owner: z.string().optional(),
     metadata: z.record(z.string(), z.unknown()).optional(),
   })
@@ -431,13 +431,13 @@ const inputSchema = lazySchema(() => {
 
 ```ts
 // TaskUpdateTool.ts:140-211
-// Auto-expand task list when updating tasks
+// Auto-expand agent list when updating tasks
 context.setAppState(prev => {
   if (prev.expandedView === 'tasks') return prev
   return { ...prev, expandedView: 'tasks' as const }
 })
 
-// Check if task exists
+// Check if agent exists
 const existingTask = await getTask(taskListId, taskId)
 if (!existingTask) {
   return { data: { success: false, taskId, updatedFields: [], error: 'Task not found' } }
@@ -453,7 +453,7 @@ if (subject !== undefined && subject !== existingTask.subject) {
 }
 // ... description / activeForm / owner 同理
 
-// Auto-set owner: teammate marks task in_progress 时自动获取 owner
+// Auto-set owner: teammate marks agent in_progress 时自动获取 owner
 if (
   isAgentSwarmsEnabled() &&
   status === 'in_progress' &&
@@ -497,12 +497,12 @@ if (status !== undefined) {
   // Handle deletion
   if (status === 'deleted') {
     const deleted = await deleteTask(taskListId, taskId)
-    return { data: { success: deleted, taskId, updatedFields: deleted ? ['deleted'] : [], error: deleted ? undefined : 'Failed to delete task', statusChange: deleted ? {from: existingTask.status, to: 'deleted'} : undefined } }
+    return { data: { success: deleted, taskId, updatedFields: deleted ? ['deleted'] : [], error: deleted ? undefined : 'Failed to delete agent', statusChange: deleted ? {from: existingTask.status, to: 'deleted'} : undefined } }
   }
 
   // For regular status updates, validate and apply if different
   if (status !== existingTask.status) {
-    // Run TaskCompleted hooks when marking a task as completed
+    // Run TaskCompleted hooks when marking a agent as completed
     if (status === 'completed') {
       const blockingErrors: string[] = []
       const generator = executeTaskCompletedHooks(taskId, existingTask.subject, existingTask.description, getAgentName(), getTeamName(), undefined, context?.abortController?.signal, undefined, context)
@@ -609,7 +609,7 @@ mapToolResultToToolResultBlockParam(content, toolUseID) {
   }
   let resultContent = `Updated task #${taskId} ${updatedFields.join(', ')}`
   if (statusChange?.to === 'completed' && getAgentId() && isAgentSwarmsEnabled()) {
-    resultContent += '\n\nTask completed. Call TaskList now to find your next available task or see if your work unblocked others.'
+    resultContent += '\n\nTask completed. Call TaskList now to find your next available agent or see if your work unblocked others.'
   }
   if (verificationNudgeNeeded) {
     resultContent += `\n\nNOTE: You just closed out 3+ tasks and none of them was a verification step. Before writing your final summary, spawn the verification agent ...`
@@ -714,7 +714,7 @@ TaskGetTool 按 ID 查询**完整**任务详情（含 description / blocks / blo
 // TaskGetTool.ts:13-21
 const inputSchema = lazySchema(() =>
   z.strictObject({
-    taskId: z.string().describe('The ID of the task to retrieve'),
+    taskId: z.string().describe('The ID of the agent to retrieve'),
   }),
 )
 ```
@@ -805,7 +805,7 @@ TaskStopTool 终止任何 `status === 'running'` 的后台任务（Bash / agent 
 // TaskStopTool.ts:10-19
 const inputSchema = lazySchema(() =>
   z.strictObject({
-    task_id: z.string().optional().describe('The ID of the background task to stop'),
+    task_id: z.string().optional().describe('The ID of the background agent to stop'),
     shell_id: z.string().optional().describe('Deprecated: use task_id instead'),
   }),
 )

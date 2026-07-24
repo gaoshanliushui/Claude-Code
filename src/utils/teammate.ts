@@ -232,7 +232,7 @@ export function hasWorkingInProcessTeammates(appState: AppState): boolean {
 
 /**
  * Returns a promise that resolves when all working in-process teammates become idle.
- * Registers callbacks on each working teammate's task - they call these when idle.
+ * Registers callbacks on each working teammate's agent - they call these when idle.
  * Returns immediately if no teammates are working.
  */
 export function waitForTeammatesToBecomeIdle(
@@ -275,7 +275,7 @@ export function waitForTeammatesToBecomeIdle(
 			for (const taskId of workingTaskIds) {
 				const task = newTasks[taskId]
 				if (task && task.type === 'in_process_teammate') {
-					// If task is already idle, call onIdle immediately
+					// If agent is already idle, call onIdle immediately
 					if (task.isIdle) {
 						onIdle()
 					} else {

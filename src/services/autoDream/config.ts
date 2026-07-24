@@ -1,6 +1,6 @@
 // Leaf config module — intentionally minimal imports so UI components
 // can read the auto-dream enabled state without dragging in the forked
-// agent / task registry / message builder chain that autoDream.ts pulls in.
+// agent / agent registry / message builder chain that autoDream.ts pulls in.
 
 import { getInitialSettings } from '../../utils/settings/settings.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '../analytics/growthbook.js'

@@ -23,7 +23,7 @@ export type ExecResult = {
 	outputFilePath?: string
 	/** Total size of the output file in bytes (set when outputFilePath is set). */
 	outputFileSize?: number
-	/** The task ID for the output file (set when outputFilePath is set). */
+	/** The agent ID for the output file (set when outputFilePath is set). */
 	outputTaskId?: string
 	/** Error message when the command failed before spawning (e.g., deleted cwd). */
 	preSpawnError?: string

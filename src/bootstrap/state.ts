@@ -1292,7 +1292,7 @@ export type SessionCronTask = {
 	createdAt: number
 	recurring?: boolean
 	/**
-	 * When set, the task was created by an in-process teammate (not the team lead).
+	 * When set, the agent was created by an in-process teammate (not the team lead).
 	 * The scheduler routes fires to that teammate's pendingUserMessages queue
 	 * instead of the main REPL command queue. Session-only — never written to disk.
 	 */

@@ -635,7 +635,7 @@ export function useInboxPoller({
           teamName,
         )
 
-        // Update in-process teammate task state if applicable
+        // Update in-process teammate agent state if applicable
         const taskId = findInProcessTeammateTaskId(m.from, currentAppState)
         if (taskId) {
           handlePlanApprovalResponse(
@@ -746,7 +746,7 @@ export function useInboxPoller({
               const { [teammateId]: _, ...remainingTeammates } =
                 prev.teamContext.teammates
 
-              // Mark the teammate's task as completed so hasRunningTeammates
+              // Mark the teammate's agent as completed so hasRunningTeammates
               // becomes false and the spinner stops. Without this, out-of-process
               // (tmux) teammate tasks stay status:'running' forever because
               // only in-process teammates have a runner that sets 'completed'.

@@ -90,7 +90,7 @@ export function isEligibleBridgeMessage(m: Message): boolean {
 /**
  * Extract title-worthy text from a Message for onUserMessage. Returns
  * undefined for messages that shouldn't title the session: non-user, meta
- * (nudges), tool results, compact summaries, non-human origins (task
+ * (nudges), tool results, compact summaries, non-human origins (agent
  * notifications, channel messages), or pure display-tag content
  * (<ide_opened_file>, <session-start-hook>, etc.).
  *

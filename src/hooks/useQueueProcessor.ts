@@ -17,7 +17,7 @@ type UseQueueProcessorParams = {
  * Hook that processes queued commands when conditions are met.
  *
  * Uses a single unified command queue (module-level store). Priority determines
- * processing order: 'now' > 'next' (user input) > 'later' (task notifications).
+ * processing order: 'now' > 'next' (user input) > 'later' (agent notifications).
  * The dequeue() function handles priority ordering automatically.
  *
  * Processing triggers when:

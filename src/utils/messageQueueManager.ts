@@ -40,7 +40,7 @@ function logOperation(operation: QueueOperation, content?: string): void {
 // ============================================================================
 // Unified command queue (module-level, independent of React state)
 //
-// All commands — user input, task notifications, orphaned permissions — go
+// All commands — user input, agent notifications, orphaned permissions — go
 // through this single queue. React components subscribe via
 // useSyncExternalStore (subscribeToCommandQueue / getCommandQueueSnapshot).
 // Non-React code (print.ts streaming loop) reads directly via
@@ -123,7 +123,7 @@ export function recheckCommandQueue(): void {
 /**
  * Add a command to the queue.
  * Used for user-initiated commands (prompt, bash, orphaned-permission).
- * Defaults priority to 'next' (processed before task notifications).
+ * Defaults priority to 'next' (processed before agent notifications).
  */
 export function enqueue(command: QueuedCommand): void {
   commandQueue.push({ ...command, priority: command.priority ?? 'next' })
@@ -135,7 +135,7 @@ export function enqueue(command: QueuedCommand): void {
 }
 
 /**
- * Add a task notification to the queue.
+ * Add a agent notification to the queue.
  * Convenience wrapper that defaults priority to 'later' so user input
  * is never starved by system messages.
  */
@@ -420,7 +420,7 @@ export type PopAllEditableResult = {
 
 /**
  * Pop all editable commands and combine them with current input for editing.
- * Notification modes (task-notification) are left in the queue
+ * Notification modes (agent-notification) are left in the queue
  * to be auto-processed later.
  * Returns object with combined text, cursor offset, and images to restore.
  * Returns undefined if no editable commands in queue.

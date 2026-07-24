@@ -460,9 +460,9 @@ function PromptInput({
   const footerItems = useMemo(() => [tasksFooterVisible && 'tasks', tmuxFooterVisible && 'tmux', bagelFooterVisible && 'bagel', teamsFooterVisible && 'teams', bridgeFooterVisible && 'bridge', companionFooterVisible && 'companion'].filter(Boolean) as FooterItem[], [tasksFooterVisible, tmuxFooterVisible, bagelFooterVisible, teamsFooterVisible, bridgeFooterVisible, companionFooterVisible]);
 
   // Effective selection: null if the selected pill stopped rendering (bridge
-  // disconnected, task finished). The derivation makes the UI correct
+  // disconnected, agent finished). The derivation makes the UI correct
   // immediately; the useEffect below clears the raw state so it doesn't
-  // resurrect when the same pill reappears (new task starts → focus stolen).
+  // resurrect when the same pill reappears (new agent starts → focus stolen).
   const rawFooterSelection = useAppState(s => s.footerSelection);
   const footerItemSelected = rawFooterSelection && footerItems.includes(rawFooterSelection) ? rawFooterSelection : null;
   useEffect(() => {
@@ -1741,7 +1741,7 @@ function PromptInput({
   // selected — its useInput is inactive, so this is the only path.
   useKeybindings({
     'footer:up': () => {
-      // ↑ scrolls within the coordinator task list before leaving the pill
+      // ↑ scrolls within the coordinator agent list before leaving the pill
       if (tasksSelected && ("external" as string) === 'ant' && coordinatorTaskCount > 0 && coordinatorTaskIndex > minCoordinatorIndex) {
         setCoordinatorTaskIndex(prev => prev - 1);
         return;
@@ -1749,7 +1749,7 @@ function PromptInput({
       navigateFooter(-1, true);
     },
     'footer:down': () => {
-      // ↓ scrolls within the coordinator task list, never leaves the pill
+      // ↓ scrolls within the coordinator agent list, never leaves the pill
       if (tasksSelected && ("external" as string) === 'ant' && coordinatorTaskCount > 0) {
         if (coordinatorTaskIndex < coordinatorTaskCount - 1) {
           setCoordinatorTaskIndex(prev => prev + 1);

@@ -120,7 +120,7 @@ export type BaseAgentDefinition = {
   baseDir?: string
   criticalSystemReminder_EXPERIMENTAL?: string // Short message re-injected at every user turn
   requiredMcpServers?: string[] // MCP server name patterns that must be configured for agent to be available
-  background?: boolean // Always run as background task when spawned
+  background?: boolean // Always run as background agent when spawned
   initialPrompt?: string // Prepended to the first user turn (slash commands work)
   memory?: AgentMemoryScope // Persistent memory scope
   isolation?: 'worktree' | 'remote' // Run in an isolated git worktree, or remotely in CCR (ant-only)

@@ -274,7 +274,7 @@ export async function initReplBridge(
     } else if (initialMessages && initialMessages.length > 0) {
       // Find the last user message that has meaningful content. Skip meta
       // (nudges), tool results, compact summaries ("This session is being
-      // continued…"), non-human origins (task notifications, channel pushes),
+      // continued…"), non-human origins (agent notifications, channel pushes),
       // and synthetic interrupts ([Request interrupted by user]) — none are
       // human-authored. Same filter as extractTitleText + isSyntheticMessage.
       for (let i = initialMessages.length - 1; i >= 0; i--) {

@@ -458,7 +458,7 @@ export const SDKControlStopTaskRequestSchema = lazySchema(() =>
       subtype: z.literal('stop_task'),
       task_id: z.string(),
     })
-    .describe('Stops a running task.'),
+    .describe('Stops a running agent.'),
 )
 
 export const SDKControlApplyFlagSettingsRequestSchema = lazySchema(() =>

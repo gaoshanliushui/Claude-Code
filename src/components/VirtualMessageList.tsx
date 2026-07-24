@@ -149,7 +149,7 @@ function computeStickyPromptText(msg: RenderableMessage): string | null {
     const block = Array.isArray(msg.message.content) ? msg.message.content[0] : undefined;
     if (!block || typeof block === 'string' || block?.type !== 'text') return null;
     raw = block.text;
-  } else if (msg.type === 'attachment' && msg.attachment.type === 'queued_command' && msg.attachment.commandMode !== 'task-notification' && !msg.attachment.isMeta) {
+  } else if (msg.type === 'attachment' && msg.attachment.type === 'queued_command' && msg.attachment.commandMode !== 'agent-notification' && !msg.attachment.isMeta) {
     const p = msg.attachment.prompt;
     raw = typeof p === 'string' ? p : (p as any[]).flatMap(b => b.type === 'text' ? [b.text] : []).join('\n');
   }

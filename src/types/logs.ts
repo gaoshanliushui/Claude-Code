@@ -91,7 +91,7 @@ export type LastPromptMessage = {
  * (which is often "ok go" or "fix it").
  */
 export type TaskSummaryMessage = {
-  type: 'task-summary'
+  type: 'agent-summary'
   sessionId: UUID
   summary: string
   timestamp: string

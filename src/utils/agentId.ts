@@ -24,7 +24,7 @@
  * 2. **Human-readable**: IDs are meaningful and debuggable (e.g., `tester@my-project`).
  *
  * 3. **Predictable**: Team leads can compute a teammate's ID without looking it up,
- *    simplifying message routing and task assignment.
+ *    simplifying message routing and agent assignment.
  *
  * ## Constraints
  *

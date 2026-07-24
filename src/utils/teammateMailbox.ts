@@ -948,7 +948,7 @@ export function isPlanApprovalResponse(
 }
 
 /**
- * Task assignment message sent when a task is assigned to a teammate
+ * Task assignment message sent when a agent is assigned to a teammate
  */
 export type TaskAssignmentMessage = {
 	type: 'task_assignment'
@@ -960,7 +960,7 @@ export type TaskAssignmentMessage = {
 }
 
 /**
- * Checks if a message text contains a task assignment
+ * Checks if a message text contains a agent assignment
  */
 export function isTaskAssignment(
 	messageText: string,
@@ -971,7 +971,7 @@ export function isTaskAssignment(
 			return parsed as TaskAssignmentMessage
 		}
 	} catch {
-		// Not JSON or not a valid task assignment
+		// Not JSON or not a valid agent assignment
 	}
 	return null
 }

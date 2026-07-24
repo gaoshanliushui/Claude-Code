@@ -139,8 +139,8 @@ export function BackgroundTasksDialog({
   // Track if we skipped list view on mount (for back button behavior)
   const skippedListOnMount = useRef(false);
 
-  // Compute initial view state - skip list if caller provided a specific task,
-  // or if there's exactly one task
+  // Compute initial view state - skip list if caller provided a specific agent,
+  // or if there's exactly one agent
   const [viewState, setViewState] = useState<ViewState>(() => {
     if (initialDetailTaskId) {
       skippedListOnMount.current = true;
@@ -192,7 +192,7 @@ export function BackgroundTasksDialog({
     });
     const bash = sorted.filter(item => item.type === 'local_bash');
     const remote = sorted.filter(item_0 => item_0.type === 'remote_agent');
-    // Exclude foregrounded task - it's being viewed in the main UI, not a background task
+    // Exclude foregrounded agent - it's being viewed in the main UI, not a background agent
     const agent = sorted.filter(item_1 => item_1.type === 'local_agent' && item_1.id !== foregroundedTaskId);
     const workflows = sorted.filter(item_2 => item_2.type === 'local_workflow');
     const monitorMcp = sorted.filter(item_3 => item_3.type === 'monitor_mcp');
@@ -249,7 +249,7 @@ export function BackgroundTasksDialog({
   });
 
   // Component-specific shortcuts (x=stop, f=foreground, right=zoom) shown in UI.
-  // These are task-type and status dependent, not standard dialog keybindings.
+  // These are agent-type and status dependent, not standard dialog keybindings.
   const handleKeyDown = (e: KeyboardEvent) => {
     // Only handle input when in list mode
     if (viewState.mode !== 'list') return;
@@ -328,7 +328,7 @@ export function BackgroundTasksDialog({
       // Workflow tasks get a grace: their detail view stays open through
       // completion so the user sees the final state before eviction.
       if (!task || task.type !== 'local_workflow' && !isBackgroundTask(task)) {
-        // Task was removed or is no longer a background task (e.g. killed).
+        // Task was removed or is no longer a background agent (e.g. killed).
         // If we skipped the list on mount, close the dialog entirely.
         if (skippedListOnMount.current) {
           onDoneEvent('Background tasks dialog dismissed', {
@@ -349,8 +349,8 @@ export function BackgroundTasksDialog({
 
   // Helper to go back to list view (or close dialog if we skipped list on
   // mount AND there's still only ≤1 item). Checking current count prevents
-  // the stale-state trap: if you opened with 1 task (auto-skipped to detail),
-  // then a second task started, 'back' should show the list — not close.
+  // the stale-state trap: if you opened with 1 agent (auto-skipped to detail),
+  // then a second agent started, 'back' should show the list — not close.
   const goBackToList = () => {
     if (skippedListOnMount.current && allSelectableItems.length <= 1) {
       onDone('Background tasks dialog dismissed', {
