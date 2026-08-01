@@ -261,7 +261,7 @@ export const call: LocalJSXCommandCall = async (onDone, context, args) => {
 		// firstPrompt extraction fail, causing the session to be dropped).
 		const directLog = await getLastSessionLog(maybeSessionId);
 		if (directLog) {
-			void onResume(maybeSessionId, directLog, 'slash_command_session_id');
+			void onResume(maybeSessionId, directLog, '、');
 			return null;
 		}
 	}
